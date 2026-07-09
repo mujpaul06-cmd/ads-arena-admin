@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ads Arena Admin</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { 
+            background: #0f172a; 
+            color: #fff; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            overflow: hidden; 
+        }
+
+        /* === HARD BLACKOUT OVERLAY (Prevents split screen 100%) === */
+        #overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: #0f172a;
+            z-index: 9998;
+            display: block;
+        }
+
+        /* === LOGIN PORTAL === */
+        #loginScreen { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            width: 100%; 
+            max-width: 400px; 
+            padding: 20px; 
+            z-index: 10000; /* Above the overlay */
+        }
+        
+        .login-box { 
+            background: #1e293b; 
+            padding: 40px; 
+            border-radius: 16px; 
+            border: 1px solid #334155; 
+            width: 100%; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none; 
+        }
+        
+        .login-box.show {
+            display: block; 
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #showLoginBtn {
+            background: transparent;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 14px;
+            z-index: 10000;
+        }
+        #showLoginBtn:hover {
+            border-color: #fbbf24;
+            color: #fbbf24;
+            background: rgba(251, 191, 36, 0.1);
+        }
+
+        .login-box h2 { 
+            color: #fbbf24; 
+            font-size: 24px; 
+            margin-bottom: 25px; 
+            text-align: center;
+        }
+        .login-box label {
+            display: block;
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .login-box input { 
+            width: 100%; 
+            background: #0f172a; 
+            color: white; 
+            border: 1px solid #334155; 
+            padding: 12px 40px 12px 12px;
+            border-radius: 8px; 
+            outline: none; 
+            font-size: 15px;
+            transition: 0.2s;
+        }
+        .login-box input:focus { 
+            border-color: #fbbf24; 
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #94a3b8;
+            font-size: 18px;
+            user-select: none;
+        }
+        .toggle-password:hover { color: #fbbf24; }
+
+        .login-btn { 
+            width: 100%; 
+            background: #fbbf24; 
+            color: #0f172a; 
+            border: none; 
+            padding: 12px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            font-size: 16px; 
+            cursor: pointer; 
+            transition: 0.2s; 
+        }
+        .login-btn:hover { background: #eab308; }
+        .login-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        #loginError { color: #f87171; margin-top: 15px; text-align: center; font-size: 14px; min-height: 20px; }
+
+        .loader-container { display: none; justify-content: center; margin-top: 20px; }
+        .loader { width: 25px; height: 25px; border: 3px solid #334155; border-top: 3px solid #fbbf24; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* === DASHBOARD === */
+        #dashboardApp { display: none; width: 100vw; height: 100vh; }
+        
+        .sidebar { width: 260px; background: #1e293b; padding: 20px 0; display: flex; flex-direction: column; border-right: 1px solid #334155; height: 100vh; }
+        .logo { font-size: 22px; font-weight: bold; color: #fbbf24; padding: 0 20px 20px; border-bottom: 1px solid #334155; }
+        .menu { list-style: none; margin-top: 10px; flex: 1; overflow-y: auto; }
+        .menu li { padding: 12px 20px; cursor: pointer; color: #94a3b8; transition: 0.2s; display: flex; align-items: center; }
+        .menu li:hover, .menu li.active { background: #334155; color: #fff; border-left: 3px solid #fbbf24; }
+        .menu li svg { margin-right: 12px; width: 20px; flex-shrink: 0; }
+        .logout { color: #f87171 !important; margin-top: auto; border-top: 1px solid #334155; }
+
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .card { background: #1e293b; padding: 20px; border-radius: 10px; border: 1px solid #334155; }
+        .card-title { color: #94a3b8; font-size: 14px; }
+        .card-value { font-size: 28px; font-weight: bold; color: #4ade80; }
+        .card-value.yellow { color: #fbbf24; }
+        .card-value.blue { color: #60a5fa; }
+
+        .dashboard-bottom { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; height: 400px; }
+        @media (max-width: 1000px) { .grid { grid-template-columns: 1fr 1fr; } .dashboard-bottom { grid-template-columns: 1fr; } }
+        
+        .chart-container { background: #1e293b; padding: 20px; border-radius: 10px; border: 1px solid #334155; }
+        .table-container { background: #1e293b; padding: 20px; border-radius: 10px; border: 1px solid #334155; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { text-align: left; color: #94a3b8; padding-bottom: 10px; border-bottom: 1px solid #334155; }
+        td { padding: 10px 0; border-bottom: 1px solid #1e293b; }
+        .rank-badge { background: #334155; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: #94a3b8; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+
+        input, textarea { background: #0f172a; color: white; border: 1px solid #334155; padding: 10px; border-radius: 5px; outline: none; width: 100%; }
+        input:focus, textarea:focus { border-color: #fbbf24; }
+        button { cursor: pointer; border: none; border-radius: 5px; font-weight: bold; padding: 8px 16px; transition: 0.2s; }
+        .btn-gold { background: #fbbf24; color: #0f172a; }
+        .btn-blue { background: #60a5fa; color: #fff; }
+        .btn-red { background: #f87171; color: #fff; }
+        
+        .chat-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; height: 70vh; }
+        @media (max-width: 800px) { .chat-grid { grid-template-columns: 1fr; } }
+        .chat-user-item { padding: 10px; background: #0f172a; margin-bottom: 5px; border-radius: 5px; cursor: pointer; border: 1px solid #334155; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. HARD BLACKOUT OVERLAY -->
+    <div id="overlay"></div>
+
+    <!-- 2. LOGIN SCREEN -->
+    <div id="loginScreen">
+        <button id="showLoginBtn" onclick="revealLoginBox()">Click to Login</button>
+
+        <div class="login-box" id="loginBox">
+            <h2>Admin Login</h2>
+            <label>Email Address</label>
+            <input type="email" id="adminEmail" placeholder="Enter your email" required>
+            
+            <label>Password</label>
+            <div class="input-wrapper">
+                <input type="password" id="adminPassword" placeholder="Enter your password" required>
+                <span class="toggle-password" onclick="togglePassword()">👁️</span>
+            </div>
+            
+            <button class="login-btn" id="loginBtn" onclick="adminLogin()">Login</button>
+            
+            <div id="loginError"></div>
+            
+            <div class="loader-container" id="loadingSpinner">
+                <div class="loader"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. DASHBOARD APP -->
+    <div id="dashboardApp" style="display:flex; width:100vw; height:100vh;">
+        <div class="sidebar">
+            <div class="logo">Ads Arena</div>
+            <ul class="menu">
+                <li class="active" onclick="switchPage('dashboard', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1"/></svg> Dashboard</li>
+                <li onclick="switchPage('users', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg> Users</li>
+                <li onclick="switchPage('adsactivity', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Ads Activity</li>
+                <li onclick="switchPage('referrals', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg> Referrals</li>
+                <li onclick="switchPage('payouts', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> Payouts</li>
+                <li onclick="switchPage('announce', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.06"/></svg> Announce</li>
+                <li onclick="switchPage('messages', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg> Messages</li>
+                <li onclick="switchPage('settings', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg> Settings</li>
+                <li class="logout" onclick="adminLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg> Logout</li>
+            </ul>
+        </div>
+
+        <div class="main-content" style="width:100%; overflow-y:auto;">
+            <div id="dashboard" class="page active">
+                <h2 style="margin-bottom: 20px;">Dashboard Overview</h2>
+                <div class="grid">
+                    <div class="card"><div class="card-title">Total Users</div><div class="card-value" id="totalUsers">0</div></div>
+                    <div class="card"><div class="card-title">Total Ads Watched</div><div class="card-value green" id="totalAds">0</div></div>
+                    <div class="card"><div class="card-title">Total Referrals</div><div class="card-value blue" id="totalRef">0</div></div>
+                    <div class="card"><div class="card-title">Total Paid ($)</div><div class="card-value yellow" id="totalPaid">$0</div></div>
+                </div>
+                <div class="dashboard-bottom">
+                    <div class="chart-container"><canvas id="adsChart"></canvas></div>
+                    <div class="table-container">
+                        <h4 style="margin-bottom: 10px;">Recent Users</h4>
+                        <table><thead><tr><th>User</th><th>Ads</th><th>Rank</th></tr></thead><tbody id="userTableBody"></tbody></table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="users" class="page">
+                <h2>All Users</h2>
+                <div class="table-container" style="height: auto; margin-top: 20px;">
+                    <table><thead><tr><th>Telegram ID</th><th>Name</th><th>Ads Watched</th><th>Rank</th></tr></thead><tbody id="allUsersBody"></tbody></table>
+                </div>
+            </div>
+
+            <div id="adsactivity" class="page">
+                <h2>Ads Activity</h2>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;">
+                    <div class="card"><div class="card-title">Today</div><div class="card-value green" id="adsToday">0</div></div>
+                    <div class="card"><div class="card-title">This Week</div><div class="card-value blue" id="adsWeek">0</div></div>
+                    <div class="card"><div class="card-title">This Month</div><div class="card-value yellow" id="adsMonth">0</div></div>
+                </div>
+            </div>
+
+            <div id="referrals" class="page">
+                <h2>Referrals</h2>
+                <div class="table-container" style="height: auto; margin-top: 20px;">
+                    <table><thead><tr><th>User</th><th>Users Invited</th></tr></thead><tbody id="refBody"></tbody></table>
+                </div>
+            </div>
+
+            <div id="payouts" class="page">
+                <h2>User Payouts</h2>
+                <div class="table-container" style="height: auto; margin-top: 20px;">
+                    <table><thead><tr><th>User</th><th>USDT Wallet</th><th>Send Amount</th><th>Action</th></tr></thead><tbody id="payoutBody"></tbody></table>
+                </div>
+            </div>
+
+            <div id="announce" class="page">
+                <h2>Send Announcement</h2>
+                <div style="background:#1e293b; padding:20px; border-radius:10px; border:1px solid #334155; margin-top:20px;">
+                    <textarea id="announceMsg" placeholder="Write your message to all users..." style="width:100%; height:100px; resize:none;"></textarea>
+                    <button class="btn-gold" onclick="sendAnnouncement()" style="margin-top:10px; padding:10px 20px;">Send to All Users</button>
+                </div>
+                <div style="margin-top:20px; background:#1e293b; padding:20px; border-radius:10px; border:1px solid #334155;">
+                    <h4>Previous Announcements</h4>
+                    <ul id="announceList" style="list-style:none; margin-top:10px;"></ul>
+                </div>
+            </div>
+
+            <div id="messages" class="page">
+                <h2>User Messages</h2>
+                <div class="chat-grid" style="margin-top: 20px;">
+                    <div style="background:#1e293b; padding:15px; border-radius:10px; border:1px solid #334155; overflow-y: auto;">
+                        <h4 style="margin-bottom:10px;">Users</h4>
+                        <div id="chatUserList"></div>
+                    </div>
+                    <div style="background:#1e293b; padding:15px; border-radius:10px; border:1px solid #334155; display: flex; flex-direction: column;">
+                        <div id="chatHeader" style="border-bottom:1px solid #334155; padding-bottom:10px; margin-bottom:10px; color:#94a3b8;">Select a user to chat</div>
+                        <div id="chatMessages" style="flex:1; overflow-y: auto; margin-bottom:10px; display:flex; flex-direction:column; gap:5px;"></div>
+                        <div style="display:flex; gap:10px;">
+                            <input type="text" id="adminReplyInput" placeholder="Type a reply..." style="flex:1;">
+                            <button class="btn-gold" onclick="sendAdminReply()" style="padding:0 20px;">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings" class="page">
+                <h2>Settings</h2>
+                <div style="background:#1e293b; padding:20px; border-radius:10px; border:1px solid #334155; margin-top:20px; max-width: 500px;">
+                    <h4 style="margin-bottom:15px;">Change Password</h4>
+                    <input type="password" id="currPass" placeholder="Current Password" style="width:100%; margin-bottom:10px;">
+                    <input type="password" id="newPass" placeholder="New Password" style="width:100%; margin-bottom:10px;">
+                    <input type="password" id="confPass" placeholder="Confirm New Password" style="width:100%; margin-bottom:15px;">
+                    <button class="btn-blue" onclick="changeAdminPassword()" style="width:100%; padding:10px;">Update Password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAIvkzIWM-0giOeJjoiYHv6Sgkb9VC70GE",
+            authDomain: "ads-arena-850c5.firebaseapp.com",
+            projectId: "ads-arena-850c5",
+            storageBucket: "ads-arena-850c5.firebasestorage.app",
+            messagingSenderId: "622761057730",
+            appId: "1:622761057730:web:39a584220c3b291c768a5b"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // --- FORCE LOGOUT ON LOAD (Fixes the stuck session) ---
+        auth.signOut().then(() => {
+            console.log("Old session cleared.");
+        }).catch((error) => {
+            console.log("No active session to clear.");
+        });
+
+        // --- REVEAL LOGIN ---
+        function revealLoginBox() {
+            const box = document.getElementById('loginBox');
+            const btn = document.getElementById('showLoginBtn');
+            box.classList.add('show');
+            btn.style.display = 'none';
+            document.getElementById('adminEmail').focus();
+        }
+
+        function togglePassword() {
+            const passInput = document.getElementById('adminPassword');
+            passInput.type = passInput.type === "password" ? "text" : "password";
+        }
+
+        // --- LOGIN LOGIC ---
+        function adminLogin() {
+            const email = document.getElementById('adminEmail').value.trim();
+            const pass = document.getElementById('adminPassword').value.trim();
+            const errorBox = document.getElementById('loginError');
+            const loginBtn = document.getElementById('loginBtn');
+            const spinner = document.getElementById('loadingSpinner');
+
+            errorBox.innerText = "";
+            if(!email || !pass) {
+                errorBox.innerText = "Please enter both email and password.
