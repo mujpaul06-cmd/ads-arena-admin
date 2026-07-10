@@ -374,4 +374,235 @@
 
             errorBox.innerText = "";
             if(!email || !pass) {
-                errorBox.innerText = "Please enter both email and password.
+                errorBox.innerText = "Please enter both email and password.";
+                return;
+            }
+
+            spinner.style.display = 'flex';
+            loginBtn.disabled = true;
+            loginBtn.innerText = "Verifying...";
+
+            auth.signInWithEmailAndPassword(email, pass)
+                .then((userCredential) => {
+                    setTimeout(() => {
+                        document.getElementById('overlay').style.display = 'none'; // Remove blackout
+                        document.getElementById('loginScreen').style.display = 'none';
+                        document.getElementById('dashboardApp').style.display = 'flex';
+                        loginBtn.disabled = false;
+                        loginBtn.innerText = "Login";
+                        spinner.style.display = 'none';
+                    }, 3000);
+                })
+                .catch((error) => {
+                    spinner.style.display = 'none';
+                    loginBtn.disabled = false;
+                    loginBtn.innerText = "Login";
+
+                    if(error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+                        // Create account if it doesn't exist
+                        auth.createUserWithEmailAndPassword(email, pass)
+                            .then(() => {
+                                setTimeout(() => {
+                                    document.getElementById('overlay').style.display = 'none';
+                                    document.getElementById('loginScreen').style.display = 'none';
+                                    document.getElementById('dashboardApp').style.display = 'flex';
+                                }, 3000);
+                            })
+                            .catch((err) => {
+                                if(err.code === 'auth/email-already-in-use') {
+                                    errorBox.innerText = "Account exists but password is wrong. Try again.";
+                                } else {
+                                    errorBox.innerText = "Error: " + err.message;
+                                }
+                            });
+                    } else if (error.code === 'auth/wrong-password') {
+                        errorBox.innerText = "Incorrect password. Try again.";
+                    } else {
+                        errorBox.innerText = "Login failed: " + error.message;
+                    }
+                });
+        }
+
+        // Enter Key support
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                const loginBox = document.getElementById('loginBox');
+                if (loginBox.classList.contains('show')) {
+                    adminLogin();
+                }
+            }
+        });
+
+        function adminLogout() {
+            if(confirm("Are you sure you want to logout?")) {
+                auth.signOut().then(() => { location.reload(); });
+            }
+        }
+
+        // --- NAVIGATION & DATA LOADING ---
+        function switchPage(pageId, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.querySelectorAll('.menu li').forEach(li => li.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        db.collection("users").onSnapshot((snapshot) => {
+            let totalUsers = snapshot.size;
+            let totalAds = 0, totalRef = 0, totalPaid = 0;
+            let usersHtml = '', allUsersHtml = '', payoutHtml = '', refHtml = '';
+            let usersArray = [];
+            
+            snapshot.forEach(doc => usersArray.push({id: doc.id, ...doc.data()}));
+            usersArray.sort((a,b) => (b.ads_watched||0) - (a.ads_watched||0));
+
+            usersArray.forEach((data, index) => {
+                totalAds += (data.ads_watched||0);
+                totalRef += (data.referrals||0);
+                totalPaid += (data.total_paid||0);
+                let name = data.username || data.first_name || 'Anonymous';
+
+                if(index < 10) usersHtml += `<tr><td>${name}</td><td>${data.ads_watched||0}</td><td><span class="rank-badge">#${index+1}</span></td></tr>`;
+                allUsersHtml += `<tr><td>${data.telegram_id||'N/A'}</td><td>${name}</td><td>${data.ads_watched||0}</td><td><span class="rank-badge">#${index+1}</span></td></tr>`;
+                let wallet = data.usdt_wallet || 'Not set';
+                payoutHtml += `<tr><td>${name}</td><td>${wallet}</td><td><input type="number" id="amt_${data.id}" placeholder="$" style="width:80px;"></td><td><button class="btn-blue" onclick="sendPayout('${data.id}', '${name}')">Send</button></td></tr>`;
+                refHtml += `<tr><td>${name}</td><td>${data.referrals||0}</td></tr>`;
+            });
+
+            document.getElementById('totalUsers').innerText = totalUsers;
+            document.getElementById('totalAds').innerText = totalAds;
+            document.getElementById('totalRef').innerText = totalRef;
+            document.getElementById('totalPaid').innerText = '$' + totalPaid.toFixed(2);
+            document.getElementById('userTableBody').innerHTML = usersHtml || '<tr><td colspan="3">No users yet</td></tr>';
+            document.getElementById('allUsersBody').innerHTML = allUsersHtml || '<tr><td colspan="4">No users yet</td></tr>';
+            document.getElementById('payoutBody').innerHTML = payoutHtml || '<tr><td colspan="4">No users with wallets yet</td></tr>';
+            document.getElementById('refBody').innerHTML = refHtml || '<tr><td colspan="2">No referrals yet</td></tr>';
+        });
+
+        function sendPayout(userId, name) {
+            let amount = parseFloat(document.getElementById(`amt_${userId}`).value);
+            if(!amount || amount <= 0) return alert("Enter a valid amount.");
+            if(confirm(`Send $${amount} to ${name}?`)) {
+                db.collection("users").doc(userId).update({
+                    total_paid: firebase.firestore.FieldValue.increment(amount)
+                }).then(() => {
+                    alert(`$${amount} recorded for ${name}!`);
+                    document.getElementById(`amt_${userId}`).value = '';
+                });
+            }
+        }
+
+        function sendAnnouncement() {
+            let msg = document.getElementById('announceMsg').value;
+            if(!msg.trim()) return alert("Write a message first!");
+            db.collection("announcements").add({
+                message: msg,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                document.getElementById('announceMsg').value = '';
+                alert("Announcement sent!");
+            });
+        }
+
+        db.collection("announcements").orderBy("timestamp", "desc").onSnapshot((snap) => {
+            let html = '';
+            snap.forEach(doc => {
+                let data = doc.data();
+                html += `<li style="background:#0f172a; padding:10px; margin-bottom:5px; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>${data.message}</span>
+                    <button class="btn-red" onclick="deleteAnnounce('${doc.id}')" style="padding:2px 10px;">Delete</button>
+                </li>`;
+            });
+            document.getElementById('announceList').innerHTML = html || '<li style="color:#64748b;">No announcements sent.</li>';
+        });
+
+        function deleteAnnounce(id) {
+            if(confirm("Delete this announcement?")) db.collection("announcements").doc(id).delete();
+        }
+
+        let currentChatUserId = null;
+        db.collection("messages").orderBy("timestamp", "asc").onSnapshot((snap) => {
+            const userListDiv = document.getElementById('chatUserList');
+            const chatMessagesDiv = document.getElementById('chatMessages');
+            let usersWithChat = new Set();
+            let chatHtml = '';
+
+            snap.forEach(doc => {
+                const data = doc.data();
+                usersWithChat.add(data.telegram_id);
+                if(data.telegram_id === currentChatUserId) {
+                    let align = data.from_admin ? 'flex-end' : 'flex-start';
+                    let bg = data.from_admin ? '#fbbf24' : '#334155';
+                    let color = data.from_admin ? '#000' : '#fff';
+                    chatHtml += `<div style="align-self:${align}; background:${bg}; color:${color}; padding:8px 12px; border-radius:10px; max-width:70%;">${data.message}</div>`;
+                }
+            });
+            
+            let userListHtml = '';
+            usersWithChat.forEach(id => {
+                userListHtml += `<div class="chat-user-item" onclick="selectChatUser('${id}')">User ${id.substring(0,6)}...</div>`;
+            });
+            userListDiv.innerHTML = userListHtml || '<div style="color:#64748b;">No messages yet.</div>';
+            
+            if(currentChatUserId) {
+                document.getElementById('chatMessages').innerHTML = chatHtml || '<div style="color:#64748b;">No messages with this user.</div>';
+                document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+            }
+        });
+
+        function selectChatUser(userId) {
+            currentChatUserId = userId;
+            document.getElementById('chatHeader').innerText = `Chatting with User: ${userId}`;
+            document.getElementById('chatMessages').innerHTML = '<div style="color:#64748b;">Loading...</div>';
+        }
+
+        function sendAdminReply() {
+            const input = document.getElementById('adminReplyInput');
+            const msg = input.value.trim();
+            if(!msg || !currentChatUserId) return alert("Select a user and type a message.");
+            db.collection("messages").add({
+                telegram_id: currentChatUserId,
+                message: msg,
+                from_admin: true,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => { input.value = ''; });
+        }
+
+        function changeAdminPassword() {
+            const newP = document.getElementById('newPass').value;
+            const conf = document.getElementById('confPass').value;
+            if(!newP || !conf) return alert("Please fill all fields.");
+            if(newP !== conf) return alert("New passwords do not match.");
+            const user = auth.currentUser;
+            if(user) {
+                user.updatePassword(newP).then(() => {
+                    alert("Password changed successfully!");
+                    document.getElementById('currPass').value = '';
+                    document.getElementById('newPass').value = '';
+                    document.getElementById('confPass').value = '';
+                }).catch((err) => { alert("Error: " + err.message); });
+            }
+        }
+
+        const ctx = document.getElementById('adsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Ads Watched',
+                    data: [0, 0, 0, 0, 0, 0, 0],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.3, fill: true
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: '#94a3b8' } } },
+                scales: { x: { ticks: { color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } }
+            }
+        });
+    </script>
+</body>
+</html>
