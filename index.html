@@ -12,42 +12,53 @@
         :root {
             --bg: #060b18; --card: #0b1529; --border: #1e293b; --text: #ffffff; --sub: #94a3b8;
             --gold: #fbbf24; --green: #22c55e; --blue: #3b82f6; --red: #ef4444;
+            --header-bg: #0b1529;
         }
+        body.theme-golden {
+            --bg: #1a120b; --card: #2a1e14; --border: #4a3525; --text: #f5f0ea; --sub: #a89a8c;
+            --gold: #d4a373; --green: #6a994e; --blue: #bc6c25; --red: #c1121f;
+            --header-bg: #2a1e14;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-        body { background: var(--bg); color: var(--text); min-height: 100vh; overflow: hidden; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; overflow: hidden; transition: background 0.3s ease, color 0.3s ease; }
 
         /* LOGIN SCREEN */
         #loginScreen {
             position: fixed; top:0; left:0; width:100vw; height:100vh;
             background: var(--bg); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:9999;
+            transition: background 0.3s ease;
         }
-        .login-box { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--border); width: 90%; max-width: 400px; }
-        .login-box h2 { color: var(--gold); text-align: center; margin-bottom: 20px; }
-        .login-box input { width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 14px; border-radius: 10px; margin-bottom: 15px; outline: none; font-size: 16px; }
+        .login-box { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--border); width: 90%; max-width: 400px; transition: background 0.3s ease, border 0.3s ease; }
+        .login-box h2 { color: var(--gold); text-align: center; margin-bottom: 20px; transition: color 0.3s ease; }
+        .login-box input { width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 14px; border-radius: 10px; margin-bottom: 15px; outline: none; font-size: 16px; transition: background 0.3s ease, color 0.3s ease, border 0.3s ease; }
         .login-box input:focus { border-color: var(--gold); }
-        .login-btn { width: 100%; background: var(--gold); color: #0f172a; border: none; padding: 14px; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .login-btn { width: 100%; background: var(--gold); color: #0f172a; border: none; padding: 14px; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; transition: background 0.3s ease; }
         .login-btn:disabled { opacity: 0.7; }
-        #loginError { color: var(--red); text-align: center; margin-top: 10px; font-size: 14px; }
+        #loginError { color: var(--red); text-align: center; margin-top: 10px; font-size: 14px; transition: color 0.3s ease; }
         .loader-container { display: none; justify-content: center; margin-top: 15px; }
         .loader { width: 24px; height: 24px; border: 3px solid var(--border); border-top: 3px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* DASHBOARD APP */
         #dashboardApp { display: none; width: 100vw; height: 100vh; display:flex; flex-direction:column; }
-        .mobile-header { background: var(--card); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-        .mobile-header h1 { font-size: 20px; color: var(--gold); }
-        .menu-btn { background: transparent; border: none; color: var(--text); font-size: 28px; cursor: pointer; padding: 5px; }
+        .mobile-header { background: var(--header-bg); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); transition: background 0.3s ease, border 0.3s ease; }
+        .mobile-header h1 { font-size: 20px; color: var(--gold); transition: color 0.3s ease; }
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        .theme-toggle-btn { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: all 0.3s ease; }
+        .theme-toggle-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .menu-btn { background: transparent; border: none; color: var(--text); font-size: 28px; cursor: pointer; padding: 5px; transition: color 0.3s ease; }
 
         /* SIDEBAR */
         .sidebar-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.8); display:none; z-index:100; }
         .sidebar-overlay.open { display:block; }
-        .sidebar { position: fixed; top:0; left:-100%; width: 280px; height:100vh; background: var(--card); border-right: 1px solid var(--border); padding: 20px 0; transition: 0.3s ease; z-index:200; overflow-y:auto; }
+        .sidebar { position: fixed; top:0; left:-100%; width: 280px; height:100vh; background: var(--header-bg); border-right: 1px solid var(--border); padding: 20px 0; transition: 0.3s ease; z-index:200; overflow-y:auto; }
         .sidebar.open { left:0; }
-        .sidebar h2 { color: var(--gold); padding: 0 20px 20px; border-bottom: 1px solid var(--border); font-size: 22px; }
-        .sidebar h2 span { color: var(--blue); font-size: 14px; }
+        .sidebar h2 { color: var(--gold); padding: 0 20px 20px; border-bottom: 1px solid var(--border); font-size: 22px; transition: color 0.3s ease, border 0.3s ease; }
+        .sidebar h2 span { color: var(--blue); font-size: 14px; transition: color 0.3s ease; }
         .sidebar ul { list-style: none; margin-top: 10px; }
         .sidebar ul li { padding: 15px 20px; cursor: pointer; color: var(--sub); transition: 0.2s; border-left: 3px solid transparent; }
-        .sidebar ul li:hover, .sidebar ul li.active { background: #1e293b; color: var(--text); border-left-color: var(--gold); }
+        .sidebar ul li:hover, .sidebar ul li.active { background: var(--card); color: var(--text); border-left-color: var(--gold); }
         .sidebar ul li.logout { color: var(--red) !important; margin-top: 20px; border-top: 1px solid var(--border); }
 
         /* MAIN CONTENT */
@@ -56,37 +67,50 @@
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
-        /* PROFESSIONAL CARDS */
+        /* CARDS */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .card { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); text-align: center; }
-        .card-title { color: var(--sub); font-size: 14px; }
-        .card-value { font-size: 28px; font-weight: bold; color: var(--green); }
+        .card { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); text-align: center; transition: background 0.3s ease, border 0.3s ease; }
+        .card-title { color: var(--sub); font-size: 14px; transition: color 0.3s ease; }
+        .card-value { font-size: 28px; font-weight: bold; color: var(--green); transition: color 0.3s ease; }
         .card-value.gold { color: var(--gold); }
         .card-value.blue { color: var(--blue); }
 
-        .table-container { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid var(--border); overflow-y: auto; max-height: 400px; }
+        .table-container { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid var(--border); overflow-y: auto; max-height: 400px; transition: background 0.3s ease, border 0.3s ease; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { text-align: left; color: var(--sub); padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+        th { text-align: left; color: var(--sub); padding-bottom: 10px; border-bottom: 1px solid var(--border); transition: color 0.3s ease, border 0.3s ease; }
         td { padding: 8px 0; border-bottom: 1px solid #1e293b; }
         .rank-badge { background: #334155; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: var(--sub); }
 
         /* FORMS */
-        input, textarea { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 12px; border-radius: 10px; outline: none; width: 100%; margin-bottom: 10px; font-size: 14px; }
+        input, textarea { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 12px; border-radius: 10px; outline: none; width: 100%; margin-bottom: 10px; font-size: 14px; transition: background 0.3s ease, color 0.3s ease, border 0.3s ease; }
         input:focus, textarea:focus { border-color: var(--gold); }
-        .btn-gold { background: var(--gold); color: #0f172a; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; }
-        .btn-blue { background: var(--blue); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; }
-        .btn-red { background: var(--red); color: #fff; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-gold { background: var(--gold); color: #0f172a; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s ease; }
+        .btn-blue { background: var(--blue); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s ease; }
+        .btn-red { background: var(--red); color: #fff; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.3s ease; }
         .payout-input { width: 80px !important; display: inline-block !important; margin: 0 5px !important; }
 
-        /* CHAT */
+        /* PRIVATE MESSAGES */
         .chat-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; height: 60vh; }
         @media (max-width: 800px) { .chat-grid { grid-template-columns: 1fr; height: auto; } }
-        .chat-user-item { padding: 10px; background: var(--bg); margin-bottom: 5px; border-radius: 8px; cursor: pointer; border: 1px solid var(--border); }
+        .chat-user-item { padding: 10px; background: var(--bg); margin-bottom: 5px; border-radius: 8px; cursor: pointer; border: 1px solid var(--border); transition: background 0.3s ease, border 0.3s ease; }
         .chat-user-item:hover { border-color: var(--gold); }
         .chat-messages { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:5px; margin-bottom:10px; max-height: 50vh; }
         .chat-message { padding: 8px 12px; border-radius: 10px; max-width: 70%; word-break: break-all; }
         .chat-message.admin { align-self: flex-end; background: var(--gold); color: #000; }
         .chat-message.user { align-self: flex-start; background: #334155; color: #fff; }
+
+        /* GROUP CHAT */
+        .group-chat-container { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; height: 65vh; }
+        .group-chat-stream { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; padding-right: 5px; }
+        .gc-msg { padding: 8px 12px; border-radius: 10px; max-width: 85%; word-break: break-all; align-self: flex-start; background: var(--bg); border: 1px solid var(--border); position: relative; }
+        .gc-msg.admin-msg { align-self: flex-end; background: var(--gold); color: #0f172a; border: none; }
+        .gc-msg .g-sender { font-size: 11px; font-weight: bold; color: var(--sub); display: block; margin-bottom: 2px; }
+        .gc-msg.admin-msg .g-sender { color: #0f172a; }
+        .gc-msg .g-time { font-size: 10px; color: var(--sub); display: block; margin-top: 3px; text-align: right; }
+        .gc-msg .g-delete { position: absolute; top: 5px; right: 8px; background: var(--red); color: #fff; border: none; border-radius: 4px; padding: 2px 6px; font-size: 10px; cursor: pointer; }
+        .gc-input-area { display: flex; gap: 10px; }
+        .gc-input-area input { flex: 1; margin: 0; }
+        .gc-input-area button { padding: 0 20px; width: auto; }
 
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
@@ -99,7 +123,7 @@
         <div class="login-box">
             <h2>Ads Arena Admin</h2>
             <input type="email" id="adminEmail" placeholder="muhapaul@gmail.com">
-            <input type="password" id="adminPassword" placeholder="Password">
+            <input type="password" id="adminPassword" placeholder="Admin2026">
             <button class="login-btn" id="loginBtn" onclick="adminLogin()">Login</button>
             <div id="loginError"></div>
             <div class="loader-container" id="loadingSpinner"><div class="loader"></div></div>
@@ -117,7 +141,8 @@
             <li onclick="switchPage('users', this)">👤 Users</li>
             <li onclick="switchPage('payouts', this)">💸 Payouts</li>
             <li onclick="switchPage('announce', this)">📢 Announce</li>
-            <li onclick="switchPage('messages', this)">💬 Messages</li>
+            <li onclick="switchPage('messages', this)">💬 Private</li>
+            <li onclick="switchPage('groupchat', this)">💬 Group Chat</li>
             <li onclick="switchPage('settings', this)">⚙️ Settings</li>
             <li class="logout" onclick="adminLogout()">🚪 Logout</li>
         </ul>
@@ -128,7 +153,9 @@
         <div class="mobile-header">
             <button class="menu-btn" onclick="toggleSidebar()">☰</button>
             <h1>Admin Bot</h1>
-            <div style="width:30px;"></div>
+            <div class="header-actions">
+                <button class="theme-toggle-btn" onclick="toggleTheme()">🎨 Theme</button>
+            </div>
         </div>
 
         <div class="main-content">
@@ -176,9 +203,9 @@
                 </div>
             </div>
 
-            <!-- MESSAGES -->
+            <!-- PRIVATE MESSAGES -->
             <div id="messages" class="page">
-                <h2 style="margin-bottom: 15px; color:var(--gold);">Messages</h2>
+                <h2 style="margin-bottom: 15px; color:var(--gold);">Private Messages</h2>
                 <div class="chat-grid">
                     <div style="background:var(--card); padding:15px; border-radius:16px; border:1px solid var(--border); overflow-y:auto;">
                         <h4 style="color:var(--sub); margin-bottom:10px;">Users</h4>
@@ -191,6 +218,18 @@
                             <input type="text" id="adminReplyInput" placeholder="Reply..." style="flex:1; margin:0;">
                             <button class="btn-gold" onclick="sendAdminReply()" style="padding:0 15px; width:auto;">Send</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GROUP CHAT -->
+            <div id="groupchat" class="page">
+                <h2 style="margin-bottom: 15px; color:var(--gold);">💬 Group Chat</h2>
+                <div class="group-chat-container">
+                    <div class="group-chat-stream" id="groupChatStream"></div>
+                    <div class="gc-input-area">
+                        <input type="text" id="adminGroupChatInput" placeholder="Type as Admin...">
+                        <button class="btn-gold" onclick="sendAdminGroupMessage()">Send</button>
                     </div>
                 </div>
             </div>
@@ -222,7 +261,7 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // --- LOGIN ---
+        // --- SECURE LOGIN ---
         function adminLogin() {
             const email = document.getElementById('adminEmail').value.trim();
             const pass = document.getElementById('adminPassword').value.trim();
@@ -245,24 +284,20 @@
                 })
                 .catch((error) => {
                     spinner.style.display = 'none'; loginBtn.disabled = false; loginBtn.innerText = "Login";
-                    if(error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-                        auth.createUserWithEmailAndPassword(email, pass).then(() => {
-                            setTimeout(() => {
-                                document.getElementById('loginScreen').style.display = 'none';
-                                document.getElementById('dashboardApp').style.display = 'flex';
-                            }, 1000);
-                        }).catch((err) => { errorBox.innerText = "Error: " + err.message; });
-                    } else if (error.code === 'auth/wrong-password') { errorBox.innerText = "Incorrect password."; } 
-                    else { errorBox.innerText = "Login failed: " + error.message; }
+                    errorBox.innerText = "❌ Access Denied. Check credentials.";
                 });
         }
 
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('dashboardApp').style.display = 'flex';
+        // --- THEME TOGGLE ---
+        function toggleTheme() {
+            document.body.classList.toggle('theme-golden');
+            const btn = document.querySelector('.theme-toggle-btn');
+            if (document.body.classList.contains('theme-golden')) {
+                btn.innerText = '🌙 Dark';
+            } else {
+                btn.innerText = '🎨 Theme';
             }
-        });
+        }
 
         // --- SIDEBAR ---
         function toggleSidebar() {
@@ -277,6 +312,7 @@
             el.classList.add('active');
             toggleSidebar();
             if(pageId === 'messages') loadMessages();
+            if(pageId === 'groupchat') loadAdminGroupChat();
         }
 
         function adminLogout() {
@@ -291,7 +327,6 @@
             
             snapshot.forEach(doc => {
                 const data = doc.data();
-                // FILTER: Only count real Telegram IDs (ignores test_)
                 if (data.telegram_id && !data.telegram_id.startsWith("test_")) {
                     usersArray.push({id: doc.id, ...data});
                 }
@@ -348,7 +383,7 @@
             let html = '';
             snap.forEach(doc => {
                 let data = doc.data();
-                html += `<li style="background:#0f172a; padding:10px; margin-bottom:5px; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
+                html += `<li style="background:var(--bg); padding:10px; margin-bottom:5px; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
                     <span>${data.message}</span>
                     <button class="btn-red" onclick="deleteAnnounce('${doc.id}')">Delete</button>
                 </li>`;
@@ -358,7 +393,7 @@
 
         function deleteAnnounce(id) { if(confirm("Delete?")) db.collection("announcements").doc(id).delete(); }
 
-        // --- MESSAGES ---
+        // --- PRIVATE MESSAGES ---
         let currentChatUserId = null;
         function loadMessages() {
             db.collection("messages").orderBy("timestamp", "asc").onSnapshot((snap) => {
@@ -369,8 +404,10 @@
 
                 snap.forEach(doc => {
                     const data = doc.data();
-                    usersWithChat.add(data.telegram_id);
-                    if(data.telegram_id === currentChatUserId) {
+                    const uid = String(data.telegram_id);
+                    usersWithChat.add(uid);
+                    
+                    if(uid === currentChatUserId) {
                         let cls = data.from_admin ? 'admin' : 'user';
                         chatHtml += `<div class="chat-message ${cls}">${data.message}</div>`;
                     }
@@ -390,7 +427,7 @@
         }
 
         function selectChatUser(userId) {
-            currentChatUserId = userId;
+            currentChatUserId = String(userId);
             document.getElementById('chatHeader').innerText = `User: ${userId}`;
             document.getElementById('chatMessages').innerHTML = '<div style="color:var(--sub);">Loading...</div>';
         }
@@ -405,6 +442,60 @@
                 from_admin: true,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => { input.value = ''; });
+        }
+
+        // --- GROUP CHAT ---
+        function loadAdminGroupChat() {
+            db.collection("groupchat").orderBy("timestamp", "asc").onSnapshot((snap) => {
+                const container = document.getElementById('groupChatStream');
+                let html = '';
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const isAdmin = data.is_admin === true;
+                    const name = data.username || "Unknown";
+                    const time = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString() : "";
+                    const msgId = doc.id;
+                    
+                    html += `
+                        <div class="gc-msg ${isAdmin ? 'admin-msg' : ''}">
+                            <span class="g-sender">${isAdmin ? '👑 Admin' : name}</span>
+                            ${data.message}
+                            <span class="g-time">${time}</span>
+                            ${!isAdmin ? `<button class="g-delete" onclick="deleteGroupMessage('${msgId}')">✕</button>` : ''}
+                        </div>
+                    `;
+                });
+                container.innerHTML = html || '<div style="text-align:center; color:var(--sub); padding:20px;">No messages yet.</div>';
+                container.scrollTop = container.scrollHeight;
+            });
+        }
+
+        function sendAdminGroupMessage() {
+            const input = document.getElementById('adminGroupChatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            db.collection("groupchat").add({
+                user_id: "admin",
+                username: "Admin",
+                message: msg,
+                is_admin: true,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                input.value = '';
+            }).catch((e) => {
+                console.error("Error sending admin group message:", e);
+            });
+        }
+
+        function deleteGroupMessage(msgId) {
+            if (confirm("Delete this user's message?")) {
+                db.collection("groupchat").doc(msgId).delete().then(() => {
+                    console.log("Message deleted");
+                }).catch((e) => {
+                    console.error("Error deleting message:", e);
+                });
+            }
         }
 
         // --- SETTINGS ---
