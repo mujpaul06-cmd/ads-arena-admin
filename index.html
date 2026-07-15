@@ -436,7 +436,7 @@
             const input = document.getElementById('adminReplyInput');
             const msg = input.value.trim();
             if(!msg || !currentChatUserId) return alert("Select a user and type a message.");
-            db.collection("admin_inbox").add({  // <-- Sending reply to the same 'admin_inbox' collection
+            db.collection("admin_inbox").add({
                 telegram_id: currentChatUserId,
                 message: msg,
                 from_admin: true,
