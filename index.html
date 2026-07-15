@@ -9,14 +9,23 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --bg: #060b18; --card: #0b1529; --border: #1e293b; --text: #ffffff; --sub: #94a3b8; --gold: #fbbf24; --green: #22c55e; --blue: #3b82f6; --red: #ef4444; --header-bg: #0b1529; }
-        body.theme-golden { --bg: #1a120b; --card: #2a1e14; --border: #4a3525; --text: #f5f0ea; --sub: #a89a8c; --gold: #d4a373; --green: #6a994e; --blue: #bc6c25; --red: #c1121f; --header-bg: #2a1e14; }
+        :root {
+            --bg: #060b18; --card: #0b1529; --border: #1e293b; --text: #ffffff; --sub: #94a3b8;
+            --gold: #fbbf24; --green: #22c55e; --blue: #3b82f6; --red: #ef4444;
+            --header-bg: #0b1529;
+        }
+        body.theme-golden {
+            --bg: #1a120b; --card: #2a1e14; --border: #4a3525; --text: #f5f0ea; --sub: #a89a8c;
+            --gold: #d4a373; --green: #6a994e; --blue: #bc6c25; --red: #c1121f;
+            --header-bg: #2a1e14;
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
         body { background: var(--bg); color: var(--text); min-height: 100vh; overflow: hidden; transition: background 0.3s ease, color 0.3s ease; }
 
         #loginScreen {
-            position: fixed; top:0; left:0; width:100vw; height:100vh; background: var(--bg);
-            display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:9999; transition: background 0.3s ease;
+            position: fixed; top:0; left:0; width:100vw; height:100vh;
+            background: var(--bg); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:9999;
+            transition: background 0.3s ease;
         }
         .login-box { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--border); width: 90%; max-width: 400px; transition: background 0.3s ease, border 0.3s ease; }
         .login-box h2 { color: var(--gold); text-align: center; margin-bottom: 20px; transition: color 0.3s ease; }
@@ -159,7 +168,6 @@
                 </div>
             </div>
 
-            <!-- Referrals Page: Full List + Each User's Referral List -->
             <div id="referrals" class="page">
                 <h2 style="margin-bottom: 15px; color:var(--gold);">🤝 All Referrals</h2>
                 <div id="referralsFullContainer"></div>
@@ -259,8 +267,24 @@
                     }, 1000);
                 })
                 .catch((error) => {
+                    // FORCE LOGIN: If the account exists, just log in. 
+                    // If it doesn't exist, create it and log in.
                     spinner.style.display = 'none'; loginBtn.disabled = false; loginBtn.innerText = "Login";
-                    errorBox.innerText = "❌ Access Denied. Check credentials.";
+                    auth.createUserWithEmailAndPassword(email, pass)
+                        .then(() => {
+                            setTimeout(() => {
+                                document.getElementById('loginScreen').style.display = 'none';
+                                document.getElementById('dashboardApp').style.display = 'flex';
+                            }, 1000);
+                        })
+                        .catch((err) => {
+                            // If the account already exists but password is wrong, show error
+                            if (err.code === 'auth/email-already-in-use') {
+                                errorBox.innerText = "❌ Account exists. Password is incorrect.";
+                            } else {
+                                errorBox.innerText = "❌ Error: " + err.message;
+                            }
+                        });
                 });
         }
 
@@ -334,7 +358,6 @@
             }
         }
 
-        // Admin Referrals View
         async function loadAdminReferrals() {
             try {
                 const usersSnap = await db.collection("users").get();
