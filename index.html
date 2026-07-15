@@ -9,25 +9,14 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root {
-            --bg: #060b18; --card: #0b1529; --border: #1e293b; --text: #ffffff; --sub: #94a3b8;
-            --gold: #fbbf24; --green: #22c55e; --blue: #3b82f6; --red: #ef4444;
-            --header-bg: #0b1529;
-        }
-        body.theme-golden {
-            --bg: #1a120b; --card: #2a1e14; --border: #4a3525; --text: #f5f0ea; --sub: #a89a8c;
-            --gold: #d4a373; --green: #6a994e; --blue: #bc6c25; --red: #c1121f;
-            --header-bg: #2a1e14;
-        }
-
+        :root { --bg: #060b18; --card: #0b1529; --border: #1e293b; --text: #ffffff; --sub: #94a3b8; --gold: #fbbf24; --green: #22c55e; --blue: #3b82f6; --red: #ef4444; --header-bg: #0b1529; }
+        body.theme-golden { --bg: #1a120b; --card: #2a1e14; --border: #4a3525; --text: #f5f0ea; --sub: #a89a8c; --gold: #d4a373; --green: #6a994e; --blue: #bc6c25; --red: #c1121f; --header-bg: #2a1e14; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
         body { background: var(--bg); color: var(--text); min-height: 100vh; overflow: hidden; transition: background 0.3s ease, color 0.3s ease; }
 
-        /* LOGIN SCREEN */
         #loginScreen {
-            position: fixed; top:0; left:0; width:100vw; height:100vh;
-            background: var(--bg); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:9999;
-            transition: background 0.3s ease;
+            position: fixed; top:0; left:0; width:100vw; height:100vh; background: var(--bg);
+            display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:9999; transition: background 0.3s ease;
         }
         .login-box { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--border); width: 90%; max-width: 400px; transition: background 0.3s ease, border 0.3s ease; }
         .login-box h2 { color: var(--gold); text-align: center; margin-bottom: 20px; transition: color 0.3s ease; }
@@ -40,7 +29,6 @@
         .loader { width: 24px; height: 24px; border: 3px solid var(--border); border-top: 3px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* DASHBOARD APP */
         #dashboardApp { display: none; width: 100vw; height: 100vh; display:flex; flex-direction:column; }
         .mobile-header { background: var(--header-bg); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); transition: background 0.3s ease, border 0.3s ease; }
         .mobile-header h1 { font-size: 20px; color: var(--gold); transition: color 0.3s ease; }
@@ -49,7 +37,6 @@
         .theme-toggle-btn:hover { border-color: var(--gold); color: var(--gold); }
         .menu-btn { background: transparent; border: none; color: var(--text); font-size: 28px; cursor: pointer; padding: 5px; transition: color 0.3s ease; }
 
-        /* SIDEBAR */
         .sidebar-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.8); display:none; z-index:100; }
         .sidebar-overlay.open { display:block; }
         .sidebar { position: fixed; top:0; left:-100%; width: 280px; height:100vh; background: var(--header-bg); border-right: 1px solid var(--border); padding: 20px 0; transition: 0.3s ease; z-index:200; overflow-y:auto; }
@@ -61,13 +48,11 @@
         .sidebar ul li:hover, .sidebar ul li.active { background: var(--card); color: var(--text); border-left-color: var(--gold); }
         .sidebar ul li.logout { color: var(--red) !important; margin-top: 20px; border-top: 1px solid var(--border); }
 
-        /* MAIN CONTENT */
         .main-content { flex:1; padding: 20px; overflow-y: auto; height: calc(100vh - 70px); }
         .page { display: none; animation: fadeIn 0.3s; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
-        /* CARDS */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .card { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); text-align: center; transition: background 0.3s ease, border 0.3s ease; }
         .card-title { color: var(--sub); font-size: 14px; transition: color 0.3s ease; }
@@ -81,7 +66,6 @@
         td { padding: 8px 0; border-bottom: 1px solid #1e293b; }
         .rank-badge { background: #334155; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: var(--sub); }
 
-        /* FORMS */
         input, textarea { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 12px; border-radius: 10px; outline: none; width: 100%; margin-bottom: 10px; font-size: 14px; transition: background 0.3s ease, color 0.3s ease, border 0.3s ease; }
         input:focus, textarea:focus { border-color: var(--gold); }
         .btn-gold { background: var(--gold); color: #0f172a; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s ease; }
@@ -89,7 +73,6 @@
         .btn-red { background: var(--red); color: #fff; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.3s ease; }
         .payout-input { width: 80px !important; display: inline-block !important; margin: 0 5px !important; }
 
-        /* PRIVATE MESSAGES */
         .chat-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; height: 60vh; }
         @media (max-width: 800px) { .chat-grid { grid-template-columns: 1fr; height: auto; } }
         .chat-user-item { padding: 10px; background: var(--bg); margin-bottom: 5px; border-radius: 8px; cursor: pointer; border: 1px solid var(--border); transition: background 0.3s ease, border 0.3s ease; }
@@ -99,7 +82,6 @@
         .chat-message.admin { align-self: flex-end; background: var(--gold); color: #000; }
         .chat-message.user { align-self: flex-start; background: #334155; color: #fff; }
 
-        /* GROUP CHAT */
         .group-chat-container { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; height: 65vh; }
         .group-chat-stream { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; padding-right: 5px; }
         .gc-msg { padding: 8px 12px; border-radius: 10px; max-width: 85%; word-break: break-all; align-self: flex-start; background: var(--bg); border: 1px solid var(--border); position: relative; }
@@ -118,7 +100,6 @@
 </head>
 <body>
 
-    <!-- LOGIN SCREEN -->
     <div id="loginScreen">
         <div class="login-box">
             <h2>Ads Arena Admin</h2>
@@ -130,15 +111,14 @@
         </div>
     </div>
 
-    <!-- SIDEBAR OVERLAY -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-    <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <h2>Ads Arena <span>Admin</span></h2>
         <ul>
             <li class="active" onclick="switchPage('dashboard', this)">📊 Dashboard</li>
             <li onclick="switchPage('users', this)">👤 Users</li>
+            <li onclick="switchPage('referrals', this)">🤝 Referrals</li>
             <li onclick="switchPage('payouts', this)">💸 Payouts</li>
             <li onclick="switchPage('announce', this)">📢 Announce</li>
             <li onclick="switchPage('messages', this)">💬 Private</li>
@@ -148,7 +128,6 @@
         </ul>
     </div>
 
-    <!-- DASHBOARD APP -->
     <div id="dashboardApp">
         <div class="mobile-header">
             <button class="menu-btn" onclick="toggleSidebar()">☰</button>
@@ -159,7 +138,6 @@
         </div>
 
         <div class="main-content">
-            <!-- DASHBOARD -->
             <div id="dashboard" class="page active">
                 <h2 style="margin-bottom: 15px; color:var(--gold);">Dashboard</h2>
                 <div class="grid">
@@ -174,7 +152,6 @@
                 </div>
             </div>
 
-            <!-- USERS -->
             <div id="users" class="page">
                 <h2 style="margin-bottom: 15px; color:var(--gold);">All Users</h2>
                 <div class="table-container" style="height:auto; max-height:none;">
@@ -182,7 +159,12 @@
                 </div>
             </div>
 
-            <!-- PAYOUTS -->
+            <!-- Referrals Page: Full List + Each User's Referral List -->
+            <div id="referrals" class="page">
+                <h2 style="margin-bottom: 15px; color:var(--gold);">🤝 All Referrals</h2>
+                <div id="referralsFullContainer"></div>
+            </div>
+
             <div id="payouts" class="page">
                 <h2 style="margin-bottom: 15px; color:var(--gold);">Payouts</h2>
                 <div class="table-container" style="height:auto; max-height:none;">
@@ -190,7 +172,6 @@
                 </div>
             </div>
 
-            <!-- ANNOUNCE -->
             <div id="announce" class="page">
                 <h2 style="margin-bottom: 15px; color:var(--gold);">Send Announcement</h2>
                 <div style="background:var(--card); padding:20px; border-radius:16px; border:1px solid var(--border); margin-bottom:20px;">
@@ -203,7 +184,6 @@
                 </div>
             </div>
 
-            <!-- PRIVATE MESSAGES -->
             <div id="messages" class="page">
                 <h2 style="margin-bottom: 15px; color:var(--gold);">Private Messages</h2>
                 <div class="chat-grid">
@@ -222,7 +202,6 @@
                 </div>
             </div>
 
-            <!-- GROUP CHAT -->
             <div id="groupchat" class="page">
                 <h2 style="margin-bottom: 15px; color:var(--gold);">💬 Group Chat</h2>
                 <div class="group-chat-container">
@@ -234,7 +213,6 @@
                 </div>
             </div>
 
-            <!-- SETTINGS -->
             <div id="settings" class="page">
                 <h2 style="margin-bottom: 15px; color:var(--gold);">Settings</h2>
                 <div style="background:var(--card); padding:20px; border-radius:16px; border:1px solid var(--border); max-width:500px;">
@@ -248,7 +226,6 @@
     </div>
 
     <script>
-        // --- FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyAIvkzIWM-0giOeJjoiYHv6Sgkb9VC70GE",
             authDomain: "ads-arena-850c5.firebaseapp.com",
@@ -261,7 +238,6 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // --- SECURE LOGIN ---
         function adminLogin() {
             const email = document.getElementById('adminEmail').value.trim();
             const pass = document.getElementById('adminPassword').value.trim();
@@ -288,18 +264,12 @@
                 });
         }
 
-        // --- THEME TOGGLE ---
         function toggleTheme() {
             document.body.classList.toggle('theme-golden');
             const btn = document.querySelector('.theme-toggle-btn');
-            if (document.body.classList.contains('theme-golden')) {
-                btn.innerText = '🌙 Dark';
-            } else {
-                btn.innerText = '🎨 Theme';
-            }
+            btn.innerText = document.body.classList.contains('theme-golden') ? '🌙 Dark' : '🎨 Theme';
         }
 
-        // --- SIDEBAR ---
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('open');
@@ -313,13 +283,11 @@
             toggleSidebar();
             if(pageId === 'messages') loadMessages();
             if(pageId === 'groupchat') loadAdminGroupChat();
+            if(pageId === 'referrals') loadAdminReferrals();
         }
 
-        function adminLogout() {
-            if(confirm("Logout?")) { auth.signOut().then(() => { location.reload(); }); }
-        }
+        function adminLogout() { if(confirm("Logout?")) { auth.signOut().then(() => { location.reload(); }); } }
 
-        // --- DASHBOARD DATA ---
         db.collection("users").onSnapshot((snapshot) => {
             let totalUsers = 0; let totalAds = 0, totalRef = 0, totalPaid = 0;
             let usersHtml = '', allUsersHtml = '', payoutHtml = '';
@@ -366,7 +334,39 @@
             }
         }
 
-        // --- ANNOUNCE ---
+        // Admin Referrals View
+        async function loadAdminReferrals() {
+            try {
+                const usersSnap = await db.collection("users").get();
+                let html = '';
+                usersSnap.forEach(doc => {
+                    const u = doc.data();
+                    if (u.telegram_id && !u.telegram_id.startsWith("test_")) {
+                        const name = u.first_name || u.username || 'Anonymous';
+                        const refCount = u.referrals || 0;
+                        html += `<div style="background:var(--card); padding:15px; border-radius:10px; border:1px solid var(--border); margin-bottom:15px;">`;
+                        html += `<strong style="color:var(--gold);">👤 ${name}</strong> <span style="color:var(--sub); font-size:12px;">(${u.telegram_id})</span> — <span style="color:var(--blue);">${refCount} Referrals</span>`;
+                        if (refCount > 0) {
+                            html += `<div style="margin-left:20px; margin-top:10px; font-size:13px; color:var(--sub);">`;
+                            const refSnap = await db.collection("users").where("referred_by", "==", doc.id).get();
+                            refSnap.forEach(refDoc => {
+                                const r = refDoc.data();
+                                html += `• 👤 ${r.first_name || 'User'} (${r.telegram_id})<br>`;
+                            });
+                            html += `</div>`;
+                        } else {
+                            html += `<div style="margin-left:20px; margin-top:5px; font-size:12px; color:var(--sub);">No referrals yet.</div>`;
+                        }
+                        html += `</div>`;
+                    }
+                });
+                document.getElementById('referralsFullContainer').innerHTML = html || '<div style="text-align:center; color:var(--sub);">No users found.</div>';
+            } catch (e) {
+                console.error("Error loading admin referrals:", e);
+                document.getElementById('referralsFullContainer').innerHTML = '<div style="color:var(--red); text-align:center;">Error loading referrals.</div>';
+            }
+        }
+
         function sendAnnouncement() {
             let msg = document.getElementById('announceMsg').value;
             if(!msg.trim()) return alert("Write a message!");
@@ -393,7 +393,6 @@
 
         function deleteAnnounce(id) { if(confirm("Delete?")) db.collection("announcements").doc(id).delete(); }
 
-        // --- PRIVATE MESSAGES ---
         let currentChatUserId = null;
         function loadMessages() {
             db.collection("admin_inbox").orderBy("timestamp", "asc").onSnapshot((snap) => {
@@ -406,7 +405,6 @@
                     const data = doc.data();
                     const uid = String(data.telegram_id);
                     usersWithChat.add(uid);
-                    
                     if(uid === currentChatUserId) {
                         let cls = data.from_admin ? 'admin' : 'user';
                         chatHtml += `<div class="chat-message ${cls}">${data.message}</div>`;
@@ -444,7 +442,6 @@
             }).then(() => { input.value = ''; });
         }
 
-        // --- GROUP CHAT ---
         function loadAdminGroupChat() {
             db.collection("groupchat").orderBy("timestamp", "asc").onSnapshot((snap) => {
                 const container = document.getElementById('groupChatStream');
@@ -455,15 +452,7 @@
                     const name = data.username || "Unknown";
                     const time = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString() : "";
                     const msgId = doc.id;
-                    
-                    html += `
-                        <div class="gc-msg ${isAdmin ? 'admin-msg' : ''}">
-                            <span class="g-sender">${isAdmin ? '👑 Admin' : name}</span>
-                            ${data.message}
-                            <span class="g-time">${time}</span>
-                            ${!isAdmin ? `<button class="g-delete" onclick="deleteGroupMessage('${msgId}')">✕</button>` : ''}
-                        </div>
-                    `;
+                    html += `<div class="gc-msg ${isAdmin ? 'admin-msg' : ''}"><span class="g-sender">${isAdmin ? '👑 Admin' : name}</span>${data.message}<span class="g-time">${time}</span>${!isAdmin ? `<button class="g-delete" onclick="deleteGroupMessage('${msgId}')">✕</button>` : ''}</div>`;
                 });
                 container.innerHTML = html || '<div style="text-align:center; color:var(--sub); padding:20px;">No messages yet.</div>';
                 container.scrollTop = container.scrollHeight;
@@ -474,31 +463,18 @@
             const input = document.getElementById('adminGroupChatInput');
             const msg = input.value.trim();
             if (!msg) return;
-
             db.collection("groupchat").add({
-                user_id: "admin",
-                username: "Admin",
-                message: msg,
-                is_admin: true,
+                user_id: "admin", username: "Admin", message: msg, is_admin: true,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                input.value = '';
-            }).catch((e) => {
-                console.error("Error sending admin group message:", e);
-            });
+            }).then(() => { input.value = ''; }).catch((e) => { console.error("Error sending admin group message:", e); });
         }
 
         function deleteGroupMessage(msgId) {
             if (confirm("Delete this user's message?")) {
-                db.collection("groupchat").doc(msgId).delete().then(() => {
-                    console.log("Message deleted");
-                }).catch((e) => {
-                    console.error("Error deleting message:", e);
-                });
+                db.collection("groupchat").doc(msgId).delete().then(() => { console.log("Message deleted"); }).catch((e) => { console.error("Error deleting message:", e); });
             }
         }
 
-        // --- SETTINGS ---
         function changeAdminPassword() {
             const newP = document.getElementById('newPass').value;
             const conf = document.getElementById('confPass').value;
@@ -508,8 +484,7 @@
             if(user) {
                 user.updatePassword(newP).then(() => {
                     alert("Password updated!");
-                    document.getElementById('newPass').value = '';
-                    document.getElementById('confPass').value = '';
+                    document.getElementById('newPass').value = ''; document.getElementById('confPass').value = '';
                 }).catch((err) => { alert("Error: " + err.message); });
             }
         }
