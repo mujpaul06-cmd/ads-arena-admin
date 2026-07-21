@@ -7,7 +7,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --bg: #060b18; --card: #0b1529; --border: #1e293b; --text: #ffffff; --sub: #94a3b8;
@@ -19,43 +18,40 @@
             --gold: #d4a373; --green: #6a994e; --blue: #bc6c25; --red: #c1121f;
             --header-bg: #2a1e14;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-        body { background: var(--bg); color: var(--text); min-height: 100vh; overflow: hidden; transition: background 0.3s ease, color 0.3s ease; }
-
+        body { background: var(--bg); color: var(--text); min-height: 100vh; overflow: hidden; transition: background 0.3s, color 0.3s; }
+        
         /* LOGIN SCREEN */
         #loginScreen {
             position: fixed; top:0; left:0; width:100vw; height:100vh;
             background: var(--bg); display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:9999;
-            transition: background 0.3s ease;
         }
-        .login-box { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--border); width: 90%; max-width: 400px; transition: background 0.3s ease, border 0.3s ease; }
-        .login-box h2 { color: var(--gold); text-align: center; margin-bottom: 20px; transition: color 0.3s ease; }
-        .login-box input { width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 14px; border-radius: 10px; margin-bottom: 15px; outline: none; font-size: 16px; transition: background 0.3s ease, color 0.3s ease, border 0.3s ease; }
+        .login-box { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid var(--border); width: 90%; max-width: 400px; }
+        .login-box h2 { color: var(--gold); text-align: center; margin-bottom: 20px; }
+        .login-box input { width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 14px; border-radius: 10px; margin-bottom: 15px; outline: none; font-size: 16px; }
         .login-box input:focus { border-color: var(--gold); }
-        .login-btn { width: 100%; background: var(--gold); color: #0f172a; border: none; padding: 14px; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; transition: background 0.3s ease; }
+        .login-btn { width: 100%; background: var(--gold); color: #0f172a; border: none; padding: 14px; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; }
         .login-btn:disabled { opacity: 0.7; }
-        #loginError { color: var(--red); text-align: center; margin-top: 10px; font-size: 14px; transition: color 0.3s ease; }
+        #loginError { color: var(--red); text-align: center; margin-top: 10px; font-size: 14px; }
         .loader-container { display: none; justify-content: center; margin-top: 15px; }
         .loader { width: 24px; height: 24px; border: 3px solid var(--border); border-top: 3px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* DASHBOARD APP */
-        #dashboardApp { display: none; width: 100vw; height: 100vh; display:flex; flex-direction:column; }
-        .mobile-header { background: var(--header-bg); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); transition: background 0.3s ease, border 0.3s ease; }
-        .mobile-header h1 { font-size: 20px; color: var(--gold); transition: color 0.3s ease; }
+        #dashboardApp { display: none; width: 100vw; height: 100vh; flex-direction:column; }
+        .mobile-header { background: var(--header-bg); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .mobile-header h1 { font-size: 20px; color: var(--gold); }
         .header-actions { display: flex; align-items: center; gap: 15px; }
-        .theme-toggle-btn { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: all 0.3s ease; }
-        .theme-toggle-btn:hover { border-color: var(--gold); color: var(--gold); }
-        .menu-btn { background: transparent; border: none; color: var(--text); font-size: 28px; cursor: pointer; padding: 5px; transition: color 0.3s ease; }
+        .theme-toggle-btn { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 5px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; }
+        .menu-btn { background: transparent; border: none; color: var(--text); font-size: 28px; cursor: pointer; padding: 5px; }
 
         /* SIDEBAR */
         .sidebar-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.8); display:none; z-index:100; }
         .sidebar-overlay.open { display:block; }
-        .sidebar { position: fixed; top:0; left:-100%; width: 280px; height:100vh; background: var(--header-bg); border-right: 1px solid var(--border); padding: 20px 0; transition: 0.3s ease; z-index:200; overflow-y:auto; }
+        .sidebar { position: fixed; top:0; left:-100%; width: 280px; height:100vh; background: var(--header-bg); border-right: 1px solid var(--border); padding: 20px 0; transition: 0.3s; z-index:200; overflow-y:auto; }
         .sidebar.open { left:0; }
-        .sidebar h2 { color: var(--gold); padding: 0 20px 20px; border-bottom: 1px solid var(--border); font-size: 22px; transition: color 0.3s ease, border 0.3s ease; }
-        .sidebar h2 span { color: var(--blue); font-size: 14px; transition: color 0.3s ease; }
+        .sidebar h2 { color: var(--gold); padding: 0 20px 20px; border-bottom: 1px solid var(--border); font-size: 22px; }
+        .sidebar h2 span { color: var(--blue); font-size: 14px; }
         .sidebar ul { list-style: none; margin-top: 10px; }
         .sidebar ul li { padding: 15px 20px; cursor: pointer; color: var(--sub); transition: 0.2s; border-left: 3px solid transparent; }
         .sidebar ul li:hover, .sidebar ul li.active { background: var(--card); color: var(--text); border-left-color: var(--gold); }
@@ -69,35 +65,40 @@
 
         /* CARDS */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .card { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); text-align: center; transition: background 0.3s ease, border 0.3s ease; }
-        .card-title { color: var(--sub); font-size: 14px; transition: color 0.3s ease; }
-        .card-value { font-size: 28px; font-weight: bold; color: var(--green); transition: color 0.3s ease; }
+        .card { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); text-align: center; }
+        .card-title { color: var(--sub); font-size: 14px; }
+        .card-value { font-size: 28px; font-weight: bold; color: var(--green); }
         .card-value.gold { color: var(--gold); }
         .card-value.blue { color: var(--blue); }
 
-        .table-container { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid var(--border); overflow-y: auto; max-height: 400px; transition: background 0.3s ease, border 0.3s ease; }
+        .table-container { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid var(--border); overflow-y: auto; max-height: 400px; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { text-align: left; color: var(--sub); padding-bottom: 10px; border-bottom: 1px solid var(--border); transition: color 0.3s ease, border 0.3s ease; }
+        th { text-align: left; color: var(--sub); padding-bottom: 10px; border-bottom: 1px solid var(--border); }
         td { padding: 8px 0; border-bottom: 1px solid #1e293b; }
         .rank-badge { background: #334155; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: var(--sub); }
+        .badge-pending { background: #92400e; color: #fbbf24; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+        .badge-paid { background: #065f46; color: #34d399; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
 
-        /* FORMS */
-        input, textarea { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 12px; border-radius: 10px; outline: none; width: 100%; margin-bottom: 10px; font-size: 14px; transition: background 0.3s ease, color 0.3s ease, border 0.3s ease; }
+        input, textarea { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 12px; border-radius: 10px; outline: none; width: 100%; margin-bottom: 10px; font-size: 14px; }
         input:focus, textarea:focus { border-color: var(--gold); }
-        .btn-gold { background: var(--gold); color: #0f172a; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s ease; }
-        .btn-blue { background: var(--blue); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; transition: background 0.3s ease; }
-        .btn-red { background: var(--red); color: #fff; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.3s ease; }
-        .payout-input { width: 80px !important; display: inline-block !important; margin: 0 5px !important; }
+        .btn-gold { background: var(--gold); color: #0f172a; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; }
+        .btn-blue { background: var(--blue); color: #fff; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; }
+        .btn-red { background: var(--red); color: #fff; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-green { background: var(--green); color: #fff; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-sm { padding: 4px 10px; font-size: 12px; width: auto; margin: 0 2px; }
 
-        /* PRIVATE MESSAGES */
+        /* CHAT STYLES */
         .chat-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; height: 60vh; }
         @media (max-width: 800px) { .chat-grid { grid-template-columns: 1fr; height: auto; } }
-        .chat-user-item { padding: 10px; background: var(--bg); margin-bottom: 5px; border-radius: 8px; cursor: pointer; border: 1px solid var(--border); transition: background 0.3s ease, border 0.3s ease; }
+        .chat-user-item { padding: 10px; background: var(--bg); margin-bottom: 5px; border-radius: 8px; cursor: pointer; border: 1px solid var(--border); transition: 0.2s; }
         .chat-user-item:hover { border-color: var(--gold); }
-        .chat-messages { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:5px; margin-bottom:10px; max-height: 50vh; }
+        .chat-user-item.active-chat { border-color: var(--gold); background: var(--card); }
+        .chat-messages { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:5px; margin-bottom:10px; max-height: 50vh; padding-right:5px; }
         .chat-message { padding: 8px 12px; border-radius: 10px; max-width: 70%; word-break: break-all; }
         .chat-message.admin { align-self: flex-end; background: var(--gold); color: #000; }
         .chat-message.user { align-self: flex-start; background: #334155; color: #fff; }
+        .chat-message .msg-time { font-size: 10px; color: var(--sub); display: block; margin-top: 3px; }
+        .chat-message.admin .msg-time { color: #555; }
 
         /* GROUP CHAT */
         .group-chat-container { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; height: 65vh; }
@@ -112,8 +113,23 @@
         .gc-input-area input { flex: 1; margin: 0; }
         .gc-input-area button { padding: 0 20px; width: auto; }
 
+        /* REFERRALS */
+        .ref-user-block { background: var(--bg); padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); }
+        .ref-user-block .ref-main { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .ref-user-block .ref-main strong { color: var(--gold); }
+        .ref-list-inline { margin-top: 8px; padding-left: 20px; display: flex; flex-wrap: wrap; gap: 6px; }
+        .ref-list-inline .ref-tag { background: var(--card); padding: 2px 10px; border-radius: 12px; font-size: 12px; color: var(--sub); border: 1px solid var(--border); }
+
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        
+        .payout-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .payout-row .info { flex:1; min-width: 150px; }
+        .payout-row .actions { display: flex; gap: 5px; flex-wrap: wrap; }
+        
+        .chat-input-area { display: flex; gap: 10px; }
+        .chat-input-area input { flex: 1; margin: 0; }
+        .chat-input-area button { padding: 0 20px; width: auto; }
     </style>
 </head>
 <body>
@@ -139,6 +155,7 @@
         <ul>
             <li class="active" onclick="switchPage('dashboard', this)">📊 Dashboard</li>
             <li onclick="switchPage('users', this)">👤 Users</li>
+            <li onclick="switchPage('referrals', this)">🔗 Referrals</li>
             <li onclick="switchPage('payouts', this)">💸 Payouts</li>
             <li onclick="switchPage('announce', this)">📢 Announce</li>
             <li onclick="switchPage('messages', this)">💬 Private</li>
@@ -164,9 +181,9 @@
                 <h2 style="margin-bottom: 15px; color:var(--gold);">Dashboard</h2>
                 <div class="grid">
                     <div class="card"><div class="card-title">Users</div><div class="card-value" id="totalUsers">0</div></div>
-                    <div class="card"><div class="card-title">Ads</div><div class="card-value green" id="totalAds">0</div></div>
+                    <div class="card"><div class="card-title">Ads</div><div class="card-value" id="totalAds">0</div></div>
                     <div class="card"><div class="card-title">Referrals</div><div class="card-value blue" id="totalRef">0</div></div>
-                    <div class="card"><div class="card-title">Paid ($)</div><div class="card-value gold" id="totalPaid">$0</div></div>
+                    <div class="card"><div class="card-title">Pending Payouts</div><div class="card-value gold" id="pendingPayouts">$0</div></div>
                 </div>
                 <div class="table-container">
                     <h4 style="margin-bottom:10px; color:var(--sub);">Recent Users</h4>
@@ -182,12 +199,24 @@
                 </div>
             </div>
 
+            <!-- REFERRALS -->
+            <div id="referrals" class="page">
+                <h2 style="margin-bottom: 15px; color:var(--gold);">📎 Referral Network</h2>
+                <div style="background:var(--card); padding:15px; border-radius:16px; border:1px solid var(--border); margin-bottom:20px;">
+                    <p style="color:var(--sub);">Every user and the friends they invited.</p>
+                </div>
+                <div id="referralNetworkContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
+            </div>
+
             <!-- PAYOUTS -->
             <div id="payouts" class="page">
-                <h2 style="margin-bottom: 15px; color:var(--gold);">Payouts</h2>
-                <div class="table-container" style="height:auto; max-height:none;">
-                    <table><thead><tr><th>User</th><th>Wallet</th><th>Amount</th><th>Action</th></tr></thead><tbody id="payoutBody"></tbody></table>
+                <h2 style="margin-bottom: 15px; color:var(--gold);">💸 Payout Requests</h2>
+                <div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap;">
+                    <button class="btn-blue" style="width:auto; padding:8px 20px;" onclick="filterPayouts('pending')">⏳ Pending</button>
+                    <button class="btn-green" style="width:auto; padding:8px 20px;" onclick="filterPayouts('paid')">✅ Paid</button>
+                    <button class="btn-gold" style="width:auto; padding:8px 20px;" onclick="filterPayouts('all')">📋 All</button>
                 </div>
+                <div id="payoutContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
             </div>
 
             <!-- ANNOUNCE -->
@@ -203,20 +232,20 @@
                 </div>
             </div>
 
-            <!-- PRIVATE MESSAGES -->
+            <!-- PRIVATE MESSAGES (FIXED) -->
             <div id="messages" class="page">
-                <h2 style="margin-bottom: 15px; color:var(--gold);">Private Messages</h2>
+                <h2 style="margin-bottom: 15px; color:var(--gold);">💬 Private Messages</h2>
                 <div class="chat-grid">
-                    <div style="background:var(--card); padding:15px; border-radius:16px; border:1px solid var(--border); overflow-y:auto;">
+                    <div style="background:var(--card); padding:15px; border-radius:16px; border:1px solid var(--border); overflow-y:auto; max-height:65vh;">
                         <h4 style="color:var(--sub); margin-bottom:10px;">Users</h4>
                         <div id="chatUserList"></div>
                     </div>
                     <div style="background:var(--card); padding:15px; border-radius:16px; border:1px solid var(--border); display:flex; flex-direction:column;">
                         <div id="chatHeader" style="color:var(--sub); border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:10px;">Select a user</div>
                         <div id="chatMessages" class="chat-messages"></div>
-                        <div style="display:flex; gap:10px;">
-                            <input type="text" id="adminReplyInput" placeholder="Reply..." style="flex:1; margin:0;">
-                            <button class="btn-gold" onclick="sendAdminReply()" style="padding:0 15px; width:auto;">Send</button>
+                        <div class="chat-input-area">
+                            <input type="text" id="adminReplyInput" placeholder="Type message as Admin..." style="flex:1; margin:0;">
+                            <button class="btn-gold" onclick="sendAdminReply()" style="padding:0 20px; width:auto;">Send</button>
                         </div>
                     </div>
                 </div>
@@ -261,7 +290,7 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // --- SECURE LOGIN ---
+        // --- LOGIN ---
         function adminLogin() {
             const email = document.getElementById('adminEmail').value.trim();
             const pass = document.getElementById('adminPassword').value.trim();
@@ -276,11 +305,9 @@
 
             auth.signInWithEmailAndPassword(email, pass)
                 .then(() => {
-                    setTimeout(() => {
-                        document.getElementById('loginScreen').style.display = 'none';
-                        document.getElementById('dashboardApp').style.display = 'flex';
-                        loginBtn.disabled = false; loginBtn.innerText = "Login"; spinner.style.display = 'none';
-                    }, 1000);
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('dashboardApp').style.display = 'flex';
+                    loginBtn.disabled = false; loginBtn.innerText = "Login"; spinner.style.display = 'none';
                 })
                 .catch((error) => {
                     spinner.style.display = 'none'; loginBtn.disabled = false; loginBtn.innerText = "Login";
@@ -288,18 +315,12 @@
                 });
         }
 
-        // --- THEME TOGGLE ---
         function toggleTheme() {
             document.body.classList.toggle('theme-golden');
             const btn = document.querySelector('.theme-toggle-btn');
-            if (document.body.classList.contains('theme-golden')) {
-                btn.innerText = '🌙 Dark';
-            } else {
-                btn.innerText = '🎨 Theme';
-            }
+            btn.innerText = document.body.classList.contains('theme-golden') ? '🌙 Dark' : '🎨 Theme';
         }
 
-        // --- SIDEBAR ---
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
             document.getElementById('sidebarOverlay').classList.toggle('open');
@@ -309,20 +330,22 @@
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             document.querySelectorAll('.sidebar ul li').forEach(li => li.classList.remove('active'));
-            el.classList.add('active');
+            if(el) el.classList.add('active');
             toggleSidebar();
             if(pageId === 'messages') loadMessages();
             if(pageId === 'groupchat') loadAdminGroupChat();
+            if(pageId === 'referrals') loadReferralNetwork();
+            if(pageId === 'payouts') loadPayouts();
         }
 
         function adminLogout() {
             if(confirm("Logout?")) { auth.signOut().then(() => { location.reload(); }); }
         }
 
-        // --- DASHBOARD DATA ---
+        // --- DASHBOARD ---
         db.collection("users").onSnapshot((snapshot) => {
-            let totalUsers = 0; let totalAds = 0, totalRef = 0, totalPaid = 0;
-            let usersHtml = '', allUsersHtml = '', payoutHtml = '';
+            let totalUsers = 0, totalAds = 0, totalRef = 0;
+            let usersHtml = '', allUsersHtml = '';
             let usersArray = [];
             
             snapshot.forEach(doc => {
@@ -338,32 +361,190 @@
                 totalUsers++;
                 totalAds += (data.ads_watched||0);
                 totalRef += (data.referrals||0);
-                totalPaid += (data.total_paid||0);
                 let name = data.first_name || data.username || 'Anonymous';
                 if(index < 10) usersHtml += `<tr><td>${name}</td><td>${data.ads_watched||0}</td><td><span class="rank-badge">#${index+1}</span></td></tr>`;
                 allUsersHtml += `<tr><td>${data.telegram_id||'N/A'}</td><td>${name}</td><td>${data.ads_watched||0}</td></tr>`;
-                let wallet = data.usdt_wallet || 'Not set';
-                payoutHtml += `<tr><td>${name}</td><td>${wallet}</td><td><input type="number" id="amt_${data.id}" class="payout-input" placeholder="$"></td><td><button class="btn-blue" onclick="sendPayout('${data.id}', '${name}')" style="padding:5px 10px;">Pay</button></td></tr>`;
             });
 
-            document.getElementById('totalUsers').innerText = totalUsers; document.getElementById('totalAds').innerText = totalAds;
-            document.getElementById('totalRef').innerText = totalRef; document.getElementById('totalPaid').innerText = '$' + totalPaid.toFixed(2);
+            document.getElementById('totalUsers').innerText = totalUsers;
+            document.getElementById('totalAds').innerText = totalAds;
+            document.getElementById('totalRef').innerText = totalRef;
             document.getElementById('userTableBody').innerHTML = usersHtml || '<tr><td colspan="3">No users</td></tr>';
             document.getElementById('allUsersBody').innerHTML = allUsersHtml || '<tr><td colspan="3">No users</td></tr>';
-            document.getElementById('payoutBody').innerHTML = payoutHtml || '<tr><td colspan="4">No payouts</td></tr>';
         });
 
-        function sendPayout(userId, name) {
-            let amount = parseFloat(document.getElementById(`amt_${userId}`).value);
-            if(!amount || amount <= 0) return alert("Enter valid amount.");
-            if(confirm(`Pay $${amount} to ${name}?`)) {
-                db.collection("users").doc(userId).update({
-                    total_paid: firebase.firestore.FieldValue.increment(amount)
-                }).then(() => {
-                    alert(`$${amount} recorded!`);
-                    document.getElementById(`amt_${userId}`).value = '';
+        // --- REFERRAL NETWORK ---
+        function loadReferralNetwork() {
+            const container = document.getElementById('referralNetworkContainer');
+            container.innerHTML = '<div style="color:var(--sub);">Loading network...</div>';
+
+            db.collection("users").get().then((snapshot) => {
+                let usersMap = {};
+                let usersArray = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.telegram_id && !data.telegram_id.startsWith("test_")) {
+                        usersMap[doc.id] = { id: doc.id, ...data };
+                        usersArray.push(doc.id);
+                    }
                 });
-            }
+
+                let html = '';
+                usersArray.forEach(uid => {
+                    const user = usersMap[uid];
+                    if (!user) return;
+                    const name = user.first_name || user.username || 'Anonymous';
+                    const refs = [];
+                    for (let key in usersMap) {
+                        if (usersMap[key].referred_by === uid) {
+                            refs.push(usersMap[key]);
+                        }
+                    }
+                    
+                    html += `
+                        <div class="ref-user-block">
+                            <div class="ref-main">
+                                <div><strong>👤 ${name}</strong> <span style="color:var(--sub); font-size:13px;">${user.telegram_id || ''}</span></div>
+                                <div style="color:var(--gold); font-size:13px;">${refs.length} referrals</div>
+                            </div>
+                            <div class="ref-list-inline">
+                                ${refs.length > 0 ? refs.map(r => `<span class="ref-tag">${r.first_name || r.username || 'User'}</span>`).join('') : '<span style="color:var(--sub); font-size:12px;">No referrals yet</span>'}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html || '<div style="color:var(--sub);">No users found.</div>';
+            }).catch((err) => {
+                container.innerHTML = '<div style="color:var(--red);">Error loading network.</div>';
+                console.error(err);
+            });
+        }
+
+        // --- PAYOUT SYSTEM ---
+        let currentFilter = 'pending';
+
+        function filterPayouts(filter) {
+            currentFilter = filter;
+            loadPayouts();
+        }
+
+        function loadPayouts() {
+            const container = document.getElementById('payoutContainer');
+            container.innerHTML = '<div style="color:var(--sub);">Loading payouts...</div>';
+
+            db.collection("withdrawals").orderBy("timestamp", "desc").onSnapshot((snap) => {
+                let html = '';
+                let pendingTotal = 0;
+                let hasData = false;
+
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const id = doc.id;
+                    const status = data.status || 'pending';
+                    if (currentFilter !== 'all' && status !== currentFilter) return;
+                    hasData = true;
+
+                    if (status === 'pending') pendingTotal += (data.amount || 0);
+
+                    const userName = data.user_name || 'User';
+                    const phone = data.phone || 'No phone';
+                    const amount = data.amount || 0;
+                    const timestamp = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : '';
+
+                    html += `
+                        <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px;">
+                            <div style="flex:2; min-width:180px;">
+                                <div><strong>${userName}</strong> <span style="color:var(--sub); font-size:13px;">${data.telegram_id || ''}</span></div>
+                                <div style="color:var(--sub); font-size:13px;">📱 ${phone}</div>
+                                <div style="color:var(--sub); font-size:12px;">${timestamp}</div>
+                            </div>
+                            <div style="font-weight:bold; color:var(--gold); font-size:18px;">$${amount.toFixed(2)}</div>
+                            <div>
+                                <span class="${status === 'pending' ? 'badge-pending' : 'badge-paid'}">${status.toUpperCase()}</span>
+                            </div>
+                            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                ${status === 'pending' ? `
+                                    <button class="btn-green btn-sm" onclick="markPaid('${id}', '${userName}', ${amount})">✅ Pay</button>
+                                    <button class="btn-red btn-sm" onclick="rejectPayout('${id}')">❌ Reject</button>
+                                ` : `
+                                    <span style="color:var(--green); font-size:13px;">✅ Paid</span>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('pendingPayouts').innerText = '$' + pendingTotal.toFixed(2);
+
+                if (!hasData) {
+                    container.innerHTML = '<div style="color:var(--sub); text-align:center; padding:30px;">No payouts in this category.</div>';
+                } else {
+                    container.innerHTML = html;
+                }
+            });
+        }
+
+        function markPaid(payoutId, userName, amount) {
+            if (!confirm(`Confirm payment of $${amount.toFixed(2)} to ${userName}?`)) return;
+
+            db.collection("withdrawals").doc(payoutId).get().then((doc) => {
+                if (!doc.exists) return alert("Payout not found.");
+                const data = doc.data();
+                const userId = data.telegram_id;
+                const userPhone = data.phone || '';
+
+                db.collection("withdrawals").doc(payoutId).update({
+                    status: 'paid',
+                    paid_at: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    if (userId) {
+                        db.collection("admin_inbox").add({
+                            telegram_id: userId,
+                            message: `✅ Your withdrawal of $${amount.toFixed(2)} has been approved and paid. (Phone: ${userPhone})`,
+                            from_admin: true,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        }).then(() => {
+                            alert(`✅ Payment of $${amount.toFixed(2)} to ${userName} marked as PAID. User has been notified.`);
+                        }).catch((err) => {
+                            alert(`Payment recorded but failed to send notification: ${err.message}`);
+                        });
+                    } else {
+                        alert(`✅ Payment of $${amount.toFixed(2)} marked as PAID.`);
+                    }
+                }).catch((err) => {
+                    alert("Error updating payout: " + err.message);
+                });
+            }).catch((err) => {
+                alert("Error fetching payout: " + err.message);
+            });
+        }
+
+        function rejectPayout(payoutId) {
+            if (!confirm("Reject this payout request?")) return;
+            db.collection("withdrawals").doc(payoutId).get().then((doc) => {
+                if (!doc.exists) return alert("Payout not found.");
+                const data = doc.data();
+                const userId = data.telegram_id;
+                const amount = data.amount || 0;
+
+                db.collection("withdrawals").doc(payoutId).update({
+                    status: 'rejected'
+                }).then(() => {
+                    if (userId) {
+                        db.collection("admin_inbox").add({
+                            telegram_id: userId,
+                            message: `❌ Your withdrawal request of $${amount.toFixed(2)} was rejected. Please contact support.`,
+                            from_admin: true,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        }).then(() => {
+                            alert("Payout rejected. User notified.");
+                        });
+                    } else {
+                        alert("Payout rejected.");
+                    }
+                });
+            });
         }
 
         // --- ANNOUNCE ---
@@ -393,55 +574,109 @@
 
         function deleteAnnounce(id) { if(confirm("Delete?")) db.collection("announcements").doc(id).delete(); }
 
-        // --- PRIVATE MESSAGES ---
+        // --- PRIVATE MESSAGES (FIXED - Admin can send and user sees it) ---
         let currentChatUserId = null;
+        let messagesUnsubscribe = null;
+
         function loadMessages() {
+            // Get all users who have sent messages
             db.collection("admin_inbox").orderBy("timestamp", "asc").onSnapshot((snap) => {
                 const userListDiv = document.getElementById('chatUserList');
-                const chatMessagesDiv = document.getElementById('chatMessages');
-                let usersWithChat = new Set();
-                let chatHtml = '';
+                let usersMap = new Map();
+                let latestMsg = {};
 
                 snap.forEach(doc => {
                     const data = doc.data();
                     const uid = String(data.telegram_id);
-                    usersWithChat.add(uid);
-                    
-                    if(uid === currentChatUserId) {
-                        let cls = data.from_admin ? 'admin' : 'user';
-                        chatHtml += `<div class="chat-message ${cls}">${data.message}</div>`;
+                    if (!usersMap.has(uid)) {
+                        usersMap.set(uid, { id: uid, lastMsg: data.message, time: data.timestamp });
+                    } else {
+                        // Update with latest
+                        const existing = usersMap.get(uid);
+                        if (data.timestamp && (!existing.time || data.timestamp.toDate() > existing.time.toDate())) {
+                            usersMap.set(uid, { id: uid, lastMsg: data.message, time: data.timestamp });
+                        }
                     }
                 });
-                
+
                 let userListHtml = '';
-                usersWithChat.forEach(id => {
-                    userListHtml += `<div class="chat-user-item" onclick="selectChatUser('${id}')">User ${id.substring(0,6)}...</div>`;
+                usersMap.forEach((user, uid) => {
+                    const isActive = (uid === currentChatUserId) ? 'active-chat' : '';
+                    const shortId = uid.substring(0, 8);
+                    userListHtml += `<div class="chat-user-item ${isActive}" onclick="selectChatUser('${uid}')">
+                        <div style="font-weight:bold;">User ${shortId}...</div>
+                        <div style="font-size:12px; color:var(--sub); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px;">${user.lastMsg || '...'}</div>
+                    </div>`;
                 });
                 userListDiv.innerHTML = userListHtml || '<div style="color:var(--sub);">No messages yet.</div>';
-                
-                if(currentChatUserId) {
-                    document.getElementById('chatMessages').innerHTML = chatHtml || '<div style="color:var(--sub);">No messages.</div>';
-                    document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+
+                // If there's a selected user, load their messages
+                if (currentChatUserId) {
+                    loadChatMessages(currentChatUserId);
                 }
             });
         }
 
+        function loadChatMessages(userId) {
+            if (messagesUnsubscribe) {
+                messagesUnsubscribe();
+                messagesUnsubscribe = null;
+            }
+
+            const chatMessagesDiv = document.getElementById('chatMessages');
+            const chatHeader = document.getElementById('chatHeader');
+            chatHeader.innerText = `💬 Chat with: ${userId.substring(0, 8)}...`;
+
+            messagesUnsubscribe = db.collection("admin_inbox")
+                .where("telegram_id", "==", userId)
+                .orderBy("timestamp", "asc")
+                .onSnapshot((snap) => {
+                    let html = '';
+                    snap.forEach(doc => {
+                        const data = doc.data();
+                        const isAdmin = data.from_admin === true;
+                        const cls = isAdmin ? 'admin' : 'user';
+                        const sender = isAdmin ? '👑 Admin' : 'User';
+                        const time = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString() : '';
+                        html += `<div class="chat-message ${cls}">
+                            <strong>${sender}:</strong> ${data.message}
+                            <span class="msg-time">${time}</span>
+                        </div>`;
+                    });
+                    chatMessagesDiv.innerHTML = html || '<div style="color:var(--sub); text-align:center; padding:20px;">No messages yet.</div>';
+                    chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+                });
+        }
+
         function selectChatUser(userId) {
             currentChatUserId = String(userId);
-            document.getElementById('chatHeader').innerText = `User: ${userId}`;
-            document.getElementById('chatMessages').innerHTML = '<div style="color:var(--sub);">Loading...</div>';
+            // Update UI highlight
+            document.querySelectorAll('.chat-user-item').forEach(el => el.classList.remove('active-chat'));
+            document.querySelectorAll('.chat-user-item').forEach(el => {
+                if (el.textContent.includes(userId.substring(0, 8))) {
+                    el.classList.add('active-chat');
+                }
+            });
+            loadChatMessages(userId);
         }
 
         function sendAdminReply() {
             const input = document.getElementById('adminReplyInput');
             const msg = input.value.trim();
-            if(!msg || !currentChatUserId) return alert("Select a user and type a message.");
+            if (!msg) return alert("Type a message.");
+            if (!currentChatUserId) return alert("Select a user first.");
+
             db.collection("admin_inbox").add({
                 telegram_id: currentChatUserId,
                 message: msg,
                 from_admin: true,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => { input.value = ''; });
+            }).then(() => {
+                input.value = '';
+                // Message will appear via snapshot listener
+            }).catch((err) => {
+                alert("Error sending message: " + err.message);
+            });
         }
 
         // --- GROUP CHAT ---
@@ -513,6 +748,12 @@
                 }).catch((err) => { alert("Error: " + err.message); });
             }
         }
+
+        // Initial loads
+        setTimeout(() => {
+            loadPayouts();
+            loadMessages();
+        }, 1000);
     </script>
 </body>
 </html>
