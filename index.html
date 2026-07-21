@@ -71,10 +71,10 @@
         .card-value.gold { color: var(--gold); }
         .card-value.blue { color: var(--blue); }
 
-        .table-container { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid var(--border); overflow-y: auto; max-height: 400px; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { text-align: left; color: var(--sub); padding-bottom: 10px; border-bottom: 1px solid var(--border); }
-        td { padding: 8px 0; border-bottom: 1px solid #1e293b; }
+        .table-container { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid var(--border); overflow-y: auto; max-height: 500px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { text-align: left; color: var(--sub); padding: 10px 5px; border-bottom: 1px solid var(--border); position: sticky; top:0; background: var(--card); z-index:5; }
+        td { padding: 8px 5px; border-bottom: 1px solid #1e293b; }
         .rank-badge { background: #334155; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: var(--sub); }
         .badge-pending { background: #92400e; color: #fbbf24; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
         .badge-paid { background: #065f46; color: #34d399; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
@@ -100,7 +100,6 @@
         .chat-message .msg-time { font-size: 10px; color: var(--sub); display: block; margin-top: 3px; }
         .chat-message.admin .msg-time { color: #555; }
 
-        /* GROUP CHAT */
         .group-chat-container { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; height: 65vh; }
         .group-chat-stream { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; padding-right: 5px; }
         .gc-msg { padding: 8px 12px; border-radius: 10px; max-width: 85%; word-break: break-all; align-self: flex-start; background: var(--bg); border: 1px solid var(--border); position: relative; }
@@ -113,7 +112,6 @@
         .gc-input-area input { flex: 1; margin: 0; }
         .gc-input-area button { padding: 0 20px; width: auto; }
 
-        /* REFERRALS */
         .ref-user-block { background: var(--bg); padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); }
         .ref-user-block .ref-main { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
         .ref-user-block .ref-main strong { color: var(--gold); }
@@ -130,6 +128,9 @@
         .chat-input-area { display: flex; gap: 10px; }
         .chat-input-area input { flex: 1; margin: 0; }
         .chat-input-area button { padding: 0 20px; width: auto; }
+
+        .balance-usd { color: var(--gold); font-weight: 600; }
+        .user-balance-cell { min-width: 70px; }
     </style>
 </head>
 <body>
@@ -187,15 +188,26 @@
                 </div>
                 <div class="table-container">
                     <h4 style="margin-bottom:10px; color:var(--sub);">Recent Users</h4>
-                    <table><thead><tr><th>User</th><th>Ads</th><th>Rank</th></tr></thead><tbody id="userTableBody"></tbody></table>
+                    <table><thead><tr><th>User</th><th>Ads</th><th>Balance</th><th>Rank</th></tr></thead><tbody id="userTableBody"></tbody></table>
                 </div>
             </div>
 
-            <!-- USERS -->
+            <!-- USERS (with Balance) -->
             <div id="users" class="page">
-                <h2 style="margin-bottom: 15px; color:var(--gold);">All Users</h2>
-                <div class="table-container" style="height:auto; max-height:none;">
-                    <table><thead><tr><th>ID</th><th>Name</th><th>Ads</th></tr></thead><tbody id="allUsersBody"></tbody></table>
+                <h2 style="margin-bottom: 15px; color:var(--gold);">👤 All Users & Balances</h2>
+                <div class="table-container" style="height:auto; max-height:70vh;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Ads</th>
+                                <th>Balance (USD)</th>
+                                <th>Referrals</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allUsersBody"></tbody>
+                    </table>
                 </div>
             </div>
 
@@ -232,7 +244,7 @@
                 </div>
             </div>
 
-            <!-- PRIVATE MESSAGES (FIXED) -->
+            <!-- PRIVATE MESSAGES -->
             <div id="messages" class="page">
                 <h2 style="margin-bottom: 15px; color:var(--gold);">💬 Private Messages</h2>
                 <div class="chat-grid">
@@ -342,7 +354,12 @@
             if(confirm("Logout?")) { auth.signOut().then(() => { location.reload(); }); }
         }
 
-        // --- DASHBOARD ---
+        // Helper: calculate USD balance from ads
+        function calculateUserBalance(ads) {
+            return (ads / 2000) * 1;
+        }
+
+        // --- DASHBOARD & USERS (with Balance) ---
         db.collection("users").onSnapshot((snapshot) => {
             let totalUsers = 0, totalAds = 0, totalRef = 0;
             let usersHtml = '', allUsersHtml = '';
@@ -362,15 +379,32 @@
                 totalAds += (data.ads_watched||0);
                 totalRef += (data.referrals||0);
                 let name = data.first_name || data.username || 'Anonymous';
-                if(index < 10) usersHtml += `<tr><td>${name}</td><td>${data.ads_watched||0}</td><td><span class="rank-badge">#${index+1}</span></td></tr>`;
-                allUsersHtml += `<tr><td>${data.telegram_id||'N/A'}</td><td>${name}</td><td>${data.ads_watched||0}</td></tr>`;
+                const balance = calculateUserBalance(data.ads_watched || 0);
+                const balanceStr = balance.toFixed(2);
+                
+                if(index < 10) {
+                    usersHtml += `<tr>
+                        <td>${name}</td>
+                        <td>${data.ads_watched||0}</td>
+                        <td class="balance-usd">$${balanceStr}</td>
+                        <td><span class="rank-badge">#${index+1}</span></td>
+                    </tr>`;
+                }
+                
+                allUsersHtml += `<tr>
+                    <td>${data.telegram_id||'N/A'}</td>
+                    <td>${name}</td>
+                    <td>${data.ads_watched||0}</td>
+                    <td class="balance-usd">$${balanceStr}</td>
+                    <td>${data.referrals||0}</td>
+                </tr>`;
             });
 
             document.getElementById('totalUsers').innerText = totalUsers;
             document.getElementById('totalAds').innerText = totalAds;
             document.getElementById('totalRef').innerText = totalRef;
-            document.getElementById('userTableBody').innerHTML = usersHtml || '<tr><td colspan="3">No users</td></tr>';
-            document.getElementById('allUsersBody').innerHTML = allUsersHtml || '<tr><td colspan="3">No users</td></tr>';
+            document.getElementById('userTableBody').innerHTML = usersHtml || '<tr><td colspan="4">No users</td></tr>';
+            document.getElementById('allUsersBody').innerHTML = allUsersHtml || '<tr><td colspan="5">No users</td></tr>';
         });
 
         // --- REFERRAL NETWORK ---
@@ -401,11 +435,13 @@
                         }
                     }
                     
+                    const balance = calculateUserBalance(user.ads_watched || 0);
+                    
                     html += `
                         <div class="ref-user-block">
                             <div class="ref-main">
                                 <div><strong>👤 ${name}</strong> <span style="color:var(--sub); font-size:13px;">${user.telegram_id || ''}</span></div>
-                                <div style="color:var(--gold); font-size:13px;">${refs.length} referrals</div>
+                                <div style="color:var(--gold); font-size:13px;">${refs.length} referrals | Balance: $${balance.toFixed(2)}</div>
                             </div>
                             <div class="ref-list-inline">
                                 ${refs.length > 0 ? refs.map(r => `<span class="ref-tag">${r.first_name || r.username || 'User'}</span>`).join('') : '<span style="color:var(--sub); font-size:12px;">No referrals yet</span>'}
@@ -574,16 +610,14 @@
 
         function deleteAnnounce(id) { if(confirm("Delete?")) db.collection("announcements").doc(id).delete(); }
 
-        // --- PRIVATE MESSAGES (FIXED - Admin can send and user sees it) ---
+        // --- PRIVATE MESSAGES ---
         let currentChatUserId = null;
         let messagesUnsubscribe = null;
 
         function loadMessages() {
-            // Get all users who have sent messages
             db.collection("admin_inbox").orderBy("timestamp", "asc").onSnapshot((snap) => {
                 const userListDiv = document.getElementById('chatUserList');
                 let usersMap = new Map();
-                let latestMsg = {};
 
                 snap.forEach(doc => {
                     const data = doc.data();
@@ -591,7 +625,6 @@
                     if (!usersMap.has(uid)) {
                         usersMap.set(uid, { id: uid, lastMsg: data.message, time: data.timestamp });
                     } else {
-                        // Update with latest
                         const existing = usersMap.get(uid);
                         if (data.timestamp && (!existing.time || data.timestamp.toDate() > existing.time.toDate())) {
                             usersMap.set(uid, { id: uid, lastMsg: data.message, time: data.timestamp });
@@ -610,7 +643,6 @@
                 });
                 userListDiv.innerHTML = userListHtml || '<div style="color:var(--sub);">No messages yet.</div>';
 
-                // If there's a selected user, load their messages
                 if (currentChatUserId) {
                     loadChatMessages(currentChatUserId);
                 }
@@ -650,7 +682,6 @@
 
         function selectChatUser(userId) {
             currentChatUserId = String(userId);
-            // Update UI highlight
             document.querySelectorAll('.chat-user-item').forEach(el => el.classList.remove('active-chat'));
             document.querySelectorAll('.chat-user-item').forEach(el => {
                 if (el.textContent.includes(userId.substring(0, 8))) {
@@ -673,7 +704,6 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 input.value = '';
-                // Message will appear via snapshot listener
             }).catch((err) => {
                 alert("Error sending message: " + err.message);
             });
