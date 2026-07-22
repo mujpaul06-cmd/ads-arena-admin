@@ -74,10 +74,11 @@
         .table-container { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid var(--border); overflow-y: auto; max-height: 500px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th { text-align: left; color: var(--sub); padding: 10px 5px; border-bottom: 1px solid var(--border); position: sticky; top:0; background: var(--card); z-index:5; }
-        td { padding: 8px 5px; border-bottom: 1px solid #1e293b; }
+        td { padding: 8px 5px; border-bottom: 1px solid #1e293b; vertical-align: middle; }
         .rank-badge { background: #334155; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: var(--sub); }
         .badge-pending { background: #92400e; color: #fbbf24; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
         .badge-paid { background: #065f46; color: #34d399; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+        .badge-deleted { background: #7f1d1d; color: #fca5a5; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
 
         input, textarea { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 12px; border-radius: 10px; outline: none; width: 100%; margin-bottom: 10px; font-size: 14px; }
         input:focus, textarea:focus { border-color: var(--gold); }
@@ -86,6 +87,16 @@
         .btn-red { background: var(--red); color: #fff; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-green { background: var(--green); color: #fff; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-sm { padding: 4px 10px; font-size: 12px; width: auto; margin: 0 2px; }
+        .btn-edit { background: var(--blue); color: #fff; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+        .btn-edit:hover { opacity: 0.8; }
+        .btn-delete { background: var(--red); color: #fff; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+        .btn-delete:hover { opacity: 0.8; }
+
+        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--green); color: #fff; padding: 12px 24px; border-radius: 10px; font-weight: bold; z-index: 9999; animation: fadeInUp 0.3s ease; display: none; }
+        .toast.error { background: var(--red); }
+        @keyframes fadeInUp { from { opacity:0; transform: translateX(-50%) translateY(20px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+        
+        .user-actions { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
 
         /* CHAT STYLES */
         .chat-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; height: 60vh; }
@@ -98,7 +109,6 @@
         .chat-message.admin { align-self: flex-end; background: var(--gold); color: #000; }
         .chat-message.user { align-self: flex-start; background: #334155; color: #fff; }
         .chat-message .msg-time { font-size: 10px; color: var(--sub); display: block; margin-top: 3px; }
-        .chat-message.admin .msg-time { color: #555; }
 
         .group-chat-container { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; height: 65vh; }
         .group-chat-stream { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; padding-right: 5px; }
@@ -121,19 +131,21 @@
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
         
-        .payout-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-        .payout-row .info { flex:1; min-width: 150px; }
-        .payout-row .actions { display: flex; gap: 5px; flex-wrap: wrap; }
-        
         .chat-input-area { display: flex; gap: 10px; }
         .chat-input-area input { flex: 1; margin: 0; }
         .chat-input-area button { padding: 0 20px; width: auto; }
 
         .balance-usd { color: var(--gold); font-weight: 600; }
-        .user-balance-cell { min-width: 70px; }
+        
+        .deleted-user-item { background: var(--card); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 5px; }
+        .deleted-user-item .del-name { color: var(--red); font-weight: bold; }
+        .deleted-user-item .del-info { color: var(--sub); font-size: 12px; }
     </style>
 </head>
 <body>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast"></div>
 
     <!-- LOGIN SCREEN -->
     <div id="loginScreen">
@@ -156,6 +168,7 @@
         <ul>
             <li class="active" onclick="switchPage('dashboard', this)">📊 Dashboard</li>
             <li onclick="switchPage('users', this)">👤 Users</li>
+            <li onclick="switchPage('deleted', this)">🗑️ Deleted Users</li>
             <li onclick="switchPage('referrals', this)">🔗 Referrals</li>
             <li onclick="switchPage('payouts', this)">💸 Payouts</li>
             <li onclick="switchPage('announce', this)">📢 Announce</li>
@@ -182,8 +195,8 @@
                 <h2 style="margin-bottom: 15px; color:var(--gold);">Dashboard</h2>
                 <div class="grid">
                     <div class="card"><div class="card-title">Users</div><div class="card-value" id="totalUsers">0</div></div>
+                    <div class="card"><div class="card-title">Deleted</div><div class="card-value" id="totalDeleted">0</div></div>
                     <div class="card"><div class="card-title">Ads</div><div class="card-value" id="totalAds">0</div></div>
-                    <div class="card"><div class="card-title">Referrals</div><div class="card-value blue" id="totalRef">0</div></div>
                     <div class="card"><div class="card-title">Pending Payouts</div><div class="card-value gold" id="pendingPayouts">$0</div></div>
                 </div>
                 <div class="table-container">
@@ -192,9 +205,9 @@
                 </div>
             </div>
 
-            <!-- USERS (with Balance) -->
+            <!-- USERS -->
             <div id="users" class="page">
-                <h2 style="margin-bottom: 15px; color:var(--gold);">👤 All Users & Balances</h2>
+                <h2 style="margin-bottom: 15px; color:var(--gold);">👤 All Users</h2>
                 <div class="table-container" style="height:auto; max-height:70vh;">
                     <table>
                         <thead>
@@ -202,13 +215,23 @@
                                 <th>ID</th>
                                 <th>Name</th>
                                 <th>Ads</th>
-                                <th>Balance (USD)</th>
+                                <th>Balance</th>
                                 <th>Referrals</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="allUsersBody"></tbody>
                     </table>
                 </div>
+            </div>
+
+            <!-- DELETED USERS LOG -->
+            <div id="deleted" class="page">
+                <h2 style="margin-bottom: 15px; color:var(--gold);">🗑️ Deleted Users Log</h2>
+                <div style="background:var(--card); padding:12px; border-radius:12px; border:1px solid var(--border); margin-bottom:15px;">
+                    <p style="color:var(--sub); font-size:13px;">⚠️ This log shows users who have been permanently deleted from the system.</p>
+                </div>
+                <div id="deletedUsersContainer" style="display:flex; flex-direction:column; gap:6px;"></div>
             </div>
 
             <!-- REFERRALS -->
@@ -302,6 +325,16 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
+        // --- TOAST ---
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast' + (isError ? ' error' : '');
+            toast.style.display = 'block';
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
         // --- LOGIN ---
         function adminLogin() {
             const email = document.getElementById('adminEmail').value.trim();
@@ -348,6 +381,7 @@
             if(pageId === 'groupchat') loadAdminGroupChat();
             if(pageId === 'referrals') loadReferralNetwork();
             if(pageId === 'payouts') loadPayouts();
+            if(pageId === 'deleted') loadDeletedUsers();
         }
 
         function adminLogout() {
@@ -359,7 +393,133 @@
             return (ads / 2000) * 1;
         }
 
-        // --- DASHBOARD & USERS (with Balance) ---
+        // --- DELETE USER (with logging) ---
+        function deleteUser(userId, userName) {
+            if (!confirm(`⚠️ Are you sure you want to delete user "${userName}"?\n\nThis action CANNOT be undone!\nAll their data will be permanently removed.`)) {
+                return;
+            }
+            
+            showToast(`Deleting user ${userName}...`);
+            
+            // Get current admin email
+            const adminEmail = auth.currentUser ? auth.currentUser.email : 'unknown';
+            
+            // Get user data before deletion for logging
+            db.collection("users").doc(userId).get().then((doc) => {
+                if (!doc.exists) {
+                    showToast('User not found.', true);
+                    return;
+                }
+                const userData = doc.data();
+                
+                // 1. Log the deletion
+                const deletionLog = {
+                    user_id: userId,
+                    user_name: userName,
+                    telegram_id: userData.telegram_id || 'N/A',
+                    ads_watched: userData.ads_watched || 0,
+                    referrals: userData.referrals || 0,
+                    balance: calculateUserBalance(userData.ads_watched || 0),
+                    deleted_by: adminEmail,
+                    deleted_at: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                // 2. Delete all user data
+                const promises = [
+                    db.collection("users").doc(userId).delete(),
+                    db.collection("withdrawals").where("user_id", "==", userId).get().then(snap => {
+                        const batch = db.batch();
+                        snap.forEach(doc => batch.delete(doc.ref));
+                        return batch.commit();
+                    }),
+                    db.collection("admin_inbox").where("telegram_id", "==", userId).get().then(snap => {
+                        const batch = db.batch();
+                        snap.forEach(doc => batch.delete(doc.ref));
+                        return batch.commit();
+                    }),
+                    db.collection("groupchat").where("user_id", "==", userId).get().then(snap => {
+                        const batch = db.batch();
+                        snap.forEach(doc => batch.delete(doc.ref));
+                        return batch.commit();
+                    }),
+                    db.collection("deleted_users").add(deletionLog)
+                ];
+                
+                Promise.all(promises)
+                    .then(() => {
+                        showToast(`✅ User "${userName}" deleted successfully!`);
+                    })
+                    .catch((err) => {
+                        console.error("Error deleting user:", err);
+                        showToast(`❌ Error deleting user: ${err.message}`, true);
+                    });
+            }).catch((err) => {
+                showToast(`❌ Error: ${err.message}`, true);
+            });
+        }
+
+        // --- LOAD DELETED USERS ---
+        function loadDeletedUsers() {
+            const container = document.getElementById('deletedUsersContainer');
+            container.innerHTML = '<div style="color:var(--sub); text-align:center; padding:20px;">Loading deleted users log...</div>';
+
+            db.collection("deleted_users")
+                .orderBy("deleted_at", "desc")
+                .onSnapshot((snap) => {
+                    let html = '';
+                    let hasData = false;
+
+                    snap.forEach(doc => {
+                        const data = doc.data();
+                        hasData = true;
+                        const time = data.deleted_at ? new Date(data.deleted_at.toDate()).toLocaleString() : 'Unknown time';
+                        
+                        html += `
+                            <div class="deleted-user-item">
+                                <div>
+                                    <span class="del-name">${data.user_name || 'Unknown User'}</span>
+                                    <span class="del-info">ID: ${data.telegram_id || 'N/A'}</span>
+                                </div>
+                                <div>
+                                    <span class="del-info">📺 ${data.ads_watched || 0} ads</span>
+                                    <span class="del-info">💰 $${(data.balance || 0).toFixed(2)}</span>
+                                    <span class="del-info">👤 ${data.referrals || 0} referrals</span>
+                                </div>
+                                <div>
+                                    <span class="del-info">🗑️ By: ${data.deleted_by || 'Unknown'}</span>
+                                    <span class="del-info">⏰ ${time}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    if (!hasData) {
+                        container.innerHTML = '<div style="color:var(--sub); text-align:center; padding:20px;">No deleted users logged yet.</div>';
+                    } else {
+                        container.innerHTML = html;
+                    }
+                });
+        }
+
+        // --- EDIT ADS FUNCTION ---
+        function editUserAds(userId, currentAds) {
+            const newAds = prompt(`Enter new number of ads watched for this user:`, currentAds);
+            if (newAds === null) return;
+            const numAds = parseInt(newAds);
+            if (isNaN(numAds) || numAds < 0) {
+                showToast('❌ Please enter a valid number (0 or greater).', true);
+                return;
+            }
+            db.collection("users").doc(userId).update({
+                ads_watched: numAds
+            }).then(() => {
+                showToast(`✅ Ads updated to ${numAds}!`);
+            }).catch((err) => {
+                showToast('❌ Error updating: ' + err.message, true);
+            });
+        }
+
+        // --- DASHBOARD & USERS ---
         db.collection("users").onSnapshot((snapshot) => {
             let totalUsers = 0, totalAds = 0, totalRef = 0;
             let usersHtml = '', allUsersHtml = '';
@@ -381,11 +541,12 @@
                 let name = data.first_name || data.username || 'Anonymous';
                 const balance = calculateUserBalance(data.ads_watched || 0);
                 const balanceStr = balance.toFixed(2);
+                const ads = data.ads_watched || 0;
                 
                 if(index < 10) {
                     usersHtml += `<tr>
                         <td>${name}</td>
-                        <td>${data.ads_watched||0}</td>
+                        <td>${ads}</td>
                         <td class="balance-usd">$${balanceStr}</td>
                         <td><span class="rank-badge">#${index+1}</span></td>
                     </tr>`;
@@ -394,17 +555,27 @@
                 allUsersHtml += `<tr>
                     <td>${data.telegram_id||'N/A'}</td>
                     <td>${name}</td>
-                    <td>${data.ads_watched||0}</td>
+                    <td><strong>${ads}</strong></td>
                     <td class="balance-usd">$${balanceStr}</td>
                     <td>${data.referrals||0}</td>
+                    <td>
+                        <div class="user-actions">
+                            <button class="btn-edit" onclick="editUserAds('${data.id}', ${ads})">✏️ Edit</button>
+                            <button class="btn-delete" onclick="deleteUser('${data.id}', '${name.replace(/'/g, "\\'")}')">🗑️ Delete</button>
+                        </div>
+                    </td>
                 </tr>`;
             });
 
             document.getElementById('totalUsers').innerText = totalUsers;
             document.getElementById('totalAds').innerText = totalAds;
-            document.getElementById('totalRef').innerText = totalRef;
             document.getElementById('userTableBody').innerHTML = usersHtml || '<tr><td colspan="4">No users</td></tr>';
-            document.getElementById('allUsersBody').innerHTML = allUsersHtml || '<tr><td colspan="5">No users</td></tr>';
+            document.getElementById('allUsersBody').innerHTML = allUsersHtml || '<tr><td colspan="6">No users</td></tr>';
+            
+            // Update deleted count
+            db.collection("deleted_users").get().then(snap => {
+                document.getElementById('totalDeleted').innerText = snap.size;
+            });
         });
 
         // --- REFERRAL NETWORK ---
@@ -541,18 +712,18 @@
                             from_admin: true,
                             timestamp: firebase.firestore.FieldValue.serverTimestamp()
                         }).then(() => {
-                            alert(`✅ Payment of $${amount.toFixed(2)} to ${userName} marked as PAID. User has been notified.`);
+                            showToast(`✅ Payment of $${amount.toFixed(2)} to ${userName} marked as PAID.`);
                         }).catch((err) => {
-                            alert(`Payment recorded but failed to send notification: ${err.message}`);
+                            showToast(`Payment recorded but failed to send notification: ${err.message}`, true);
                         });
                     } else {
-                        alert(`✅ Payment of $${amount.toFixed(2)} marked as PAID.`);
+                        showToast(`✅ Payment of $${amount.toFixed(2)} marked as PAID.`);
                     }
                 }).catch((err) => {
-                    alert("Error updating payout: " + err.message);
+                    showToast("Error updating payout: " + err.message, true);
                 });
             }).catch((err) => {
-                alert("Error fetching payout: " + err.message);
+                showToast("Error fetching payout: " + err.message, true);
             });
         }
 
@@ -574,10 +745,10 @@
                             from_admin: true,
                             timestamp: firebase.firestore.FieldValue.serverTimestamp()
                         }).then(() => {
-                            alert("Payout rejected. User notified.");
+                            showToast("Payout rejected. User notified.");
                         });
                     } else {
-                        alert("Payout rejected.");
+                        showToast("Payout rejected.");
                     }
                 });
             });
@@ -592,7 +763,7 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 document.getElementById('announceMsg').value = '';
-                alert("Announcement sent!");
+                showToast("Announcement sent!");
             });
         }
 
@@ -783,6 +954,7 @@
         setTimeout(() => {
             loadPayouts();
             loadMessages();
+            loadDeletedUsers();
         }, 1000);
     </script>
 </body>
