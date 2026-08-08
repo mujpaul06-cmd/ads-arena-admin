@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ads Arena Admin Bot</title>
+    <title>Ads Arena Admin Panel</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
         :root {
-            --bg: #060b18; --card: #0b1529; --border: #1e293b; --text: #ffffff; --sub: #94a3b8;
-            --gold: #fbbf24; --green: #22c55e; --blue: #3b82f6; --red: #ef4444;
+            --bg: #060b18;
+            --card: #0b1529;
+            --border: #1e293b;
+            --text: #ffffff;
+            --sub: #94a3b8;
+            --gold: #fbbf24;
+            --green: #22c55e;
+            --blue: #3b82f6;
+            --red: #ef4444;
             --header-bg: #0b1529;
             --purple: #8b5cf6;
             --pink: #ec4899;
-        }
-        body.theme-golden {
-            --bg: #1a120b; --card: #2a1e14; --border: #4a3525; --text: #f5f0ea; --sub: #a89a8c;
-            --gold: #d4a373; --green: #6a994e; --blue: #bc6c25; --red: #c1121f;
-            --header-bg: #2a1e14;
-            --purple: #a78bfa;
-            --pink: #f472b6;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
         body { background: var(--bg); color: var(--text); min-height: 100vh; overflow: hidden; transition: background 0.3s, color 0.3s; }
@@ -41,7 +41,7 @@
         .loader { width: 24px; height: 24px; border: 3px solid var(--border); border-top: 3px solid var(--gold); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* DASHBOARD APP */
+        /* DASHBOARD */
         #dashboardApp { display: none; width: 100vw; height: 100vh; flex-direction:column; }
         .mobile-header { background: var(--header-bg); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
         .mobile-header h1 { font-size: 20px; color: var(--gold); }
@@ -75,40 +75,12 @@
         .card-value.gold { color: var(--gold); }
         .card-value.blue { color: var(--blue); }
         .card-value.green { color: var(--green); }
-        .card-value.purple { color: var(--purple); }
-        .card-value.pink { color: var(--pink); }
-
-        /* Network Stats Cards */
-        .network-stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .network-card { background: var(--card); padding: 18px; border-radius: 16px; border: 1px solid var(--border); text-align: center; }
-        .network-card .network-icon { font-size: 28px; margin-bottom: 5px; }
-        .network-card .network-name { color: var(--sub); font-size: 14px; font-weight: 600; }
-        .network-card .network-ads { font-size: 24px; font-weight: bold; margin: 5px 0; }
-        .network-card .network-users { font-size: 12px; color: var(--sub); }
-        .network-card .network-detail { font-size: 11px; color: var(--sub); margin-top: 4px; }
-        .network-card.network-1 { border-left: 4px solid var(--blue); }
-        .network-card.network-2 { border-left: 4px solid var(--purple); }
-        .network-card.network-3 { border-left: 4px solid var(--pink); }
-        .network-card .network-ads.blue { color: var(--blue); }
-        .network-card .network-ads.purple { color: var(--purple); }
-        .network-card .network-ads.pink { color: var(--pink); }
-
-        @media (max-width: 600px) {
-            .network-stats-grid { grid-template-columns: 1fr; }
-        }
 
         .table-container { background: var(--card); padding: 15px; border-radius: 16px; border: 1px solid var(--border); overflow-y: auto; max-height: 500px; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th { text-align: left; color: var(--sub); padding: 10px 5px; border-bottom: 1px solid var(--border); position: sticky; top:0; background: var(--card); z-index:5; }
         td { padding: 8px 5px; border-bottom: 1px solid #1e293b; vertical-align: middle; }
         .rank-badge { background: #334155; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: var(--sub); }
-        .badge-pending { background: #92400e; color: #fbbf24; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
-        .badge-paid { background: #065f46; color: #34d399; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
-        .badge-deleted { background: #7f1d1d; color: #fca5a5; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
-        .network-tag { padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
-        .network-tag.n1 { background: rgba(59,130,246,0.2); color: var(--blue); }
-        .network-tag.n2 { background: rgba(139,92,246,0.2); color: var(--purple); }
-        .network-tag.n3 { background: rgba(236,72,153,0.2); color: var(--pink); }
 
         input, textarea { background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 12px; border-radius: 10px; outline: none; width: 100%; margin-bottom: 10px; font-size: 14px; }
         input:focus, textarea:focus { border-color: var(--gold); }
@@ -118,17 +90,35 @@
         .btn-green { background: var(--green); color: #fff; border: none; padding: 5px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-sm { padding: 4px 10px; font-size: 12px; width: auto; margin: 0 2px; }
         .btn-edit { background: var(--blue); color: #fff; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
-        .btn-edit:hover { opacity: 0.8; }
         .btn-delete { background: var(--red); color: #fff; border: none; padding: 3px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
-        .btn-delete:hover { opacity: 0.8; }
 
         .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--green); color: #fff; padding: 12px 24px; border-radius: 10px; font-weight: bold; z-index: 9999; animation: fadeInUp 0.3s ease; display: none; }
         .toast.error { background: var(--red); }
         @keyframes fadeInUp { from { opacity:0; transform: translateX(-50%) translateY(20px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
-        
-        .user-actions { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
 
-        /* CHAT STYLES */
+        .network-tag { padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .network-tag.n1 { background: rgba(59,130,246,0.2); color: var(--blue); }
+        .network-tag.n2 { background: rgba(139,92,246,0.2); color: var(--purple); }
+        .network-tag.n3 { background: rgba(236,72,153,0.2); color: var(--pink); }
+
+        .badge-pending { background: #92400e; color: #fbbf24; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+        .badge-paid { background: #065f46; color: #34d399; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+        .badge-rejected { background: #7f1d1d; color: #fca5a5; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+
+        .user-actions { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+        .no-data { text-align: center; color: var(--sub); padding: 30px 0; font-size: 14px; }
+        .loading-text { text-align: center; color: var(--sub); padding: 30px 0; font-size: 14px; }
+
+        .ref-user-block { background: var(--bg); padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); }
+        .ref-user-block .ref-main { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .ref-user-block .ref-main strong { color: var(--gold); }
+        .ref-list-inline { margin-top: 8px; padding-left: 20px; display: flex; flex-wrap: wrap; gap: 6px; }
+        .ref-list-inline .ref-tag { background: var(--card); padding: 2px 10px; border-radius: 12px; font-size: 12px; color: var(--sub); border: 1px solid var(--border); }
+
+        .deleted-user-item { background: var(--card); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 5px; }
+        .deleted-user-item .del-name { color: var(--red); font-weight: bold; }
+        .deleted-user-item .del-info { color: var(--sub); font-size: 12px; }
+
         .chat-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; height: 60vh; }
         @media (max-width: 800px) { .chat-grid { grid-template-columns: 1fr; height: auto; } }
         .chat-user-item { padding: 10px; background: var(--bg); margin-bottom: 5px; border-radius: 8px; cursor: pointer; border: 1px solid var(--border); transition: 0.2s; }
@@ -152,38 +142,34 @@
         .gc-input-area input { flex: 1; margin: 0; }
         .gc-input-area button { padding: 0 20px; width: auto; }
 
-        .ref-user-block { background: var(--bg); padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border); }
-        .ref-user-block .ref-main { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-        .ref-user-block .ref-main strong { color: var(--gold); }
-        .ref-list-inline { margin-top: 8px; padding-left: 20px; display: flex; flex-wrap: wrap; gap: 6px; }
-        .ref-list-inline .ref-tag { background: var(--card); padding: 2px 10px; border-radius: 12px; font-size: 12px; color: var(--sub); border: 1px solid var(--border); }
-
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-        
         .chat-input-area { display: flex; gap: 10px; }
         .chat-input-area input { flex: 1; margin: 0; }
         .chat-input-area button { padding: 0 20px; width: auto; }
 
-        .balance-usd { color: var(--gold); font-weight: 600; }
-        
-        .deleted-user-item { background: var(--card); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 5px; }
-        .deleted-user-item .del-name { color: var(--red); font-weight: bold; }
-        .deleted-user-item .del-info { color: var(--sub); font-size: 12px; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
-        .network-breakdown { margin-top: 8px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
-        .network-breakdown span { font-size: 12px; }
-        .network-breakdown .nb1 { color: var(--blue); }
-        .network-breakdown .nb2 { color: var(--purple); }
-        .network-breakdown .nb3 { color: var(--pink); }
+        .withdraw-tabs { display:flex; gap:10px; margin-bottom:15px; flex-wrap:wrap; }
+        .withdraw-tabs button { background:var(--card); color:var(--sub); border:1px solid var(--border); padding:8px 16px; border-radius:20px; cursor:pointer; transition:0.2s; }
+        .withdraw-tabs button.active { background:var(--blue); color:#fff; border-color:var(--blue); }
+
+        .history-item { background:var(--card); padding:12px 16px; border-radius:10px; border:1px solid var(--border); margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:5px; }
+        .history-item .h-amount { font-weight:bold; color:var(--gold); }
+        .history-item .h-status { font-size:12px; padding:2px 10px; border-radius:12px; }
+        .history-item .h-status.pending { background:#92400e; color:#fbbf24; }
+        .history-item .h-status.paid { background:#065f46; color:#34d399; }
+        .history-item .h-status.rejected { background:#7f1d1d; color:#fca5a5; }
+        .history-item .h-date { color:var(--sub); font-size:11px; }
+
+        .balance-usd { color: var(--gold); font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <!-- TOAST NOTIFICATION -->
+    <!-- TOAST -->
     <div id="toast" class="toast"></div>
 
-    <!-- LOGIN SCREEN -->
+    <!-- LOGIN -->
     <div id="loginScreen">
         <div class="login-box">
             <h2>Ads Arena Admin</h2>
@@ -195,16 +181,14 @@
         </div>
     </div>
 
-    <!-- SIDEBAR OVERLAY -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
     <!-- SIDEBAR -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
     <div class="sidebar" id="sidebar">
         <h2>Ads Arena <span>Admin</span></h2>
         <ul>
             <li class="active" onclick="switchPage('dashboard', this)">📊 Dashboard</li>
             <li onclick="switchPage('users', this)">👤 Users</li>
-            <li onclick="switchPage('deleted', this)">🗑️ Deleted Users</li>
+            <li onclick="switchPage('deleted', this)">🗑️ Deleted</li>
             <li onclick="switchPage('referrals', this)">🔗 Referrals</li>
             <li onclick="switchPage('payouts', this)">💸 Payouts</li>
             <li onclick="switchPage('announce', this)">📢 Announce</li>
@@ -229,45 +213,16 @@
             <!-- DASHBOARD -->
             <div id="dashboard" class="page active">
                 <h2 style="margin-bottom: 15px; color:var(--gold);">Dashboard</h2>
-                
-                <!-- Main Stats -->
                 <div class="grid">
-                    <div class="card"><div class="card-title">Users</div><div class="card-value" id="totalUsers">0</div></div>
-                    <div class="card"><div class="card-title">Deleted</div><div class="card-value" id="totalDeleted">0</div></div>
+                    <div class="card"><div class="card-title">Total Users</div><div class="card-value" id="totalUsers">0</div></div>
+                    <div class="card"><div class="card-title">Deleted Users</div><div class="card-value" id="totalDeleted">0</div></div>
                     <div class="card"><div class="card-title">Total Ads</div><div class="card-value gold" id="totalAds">0</div></div>
                     <div class="card"><div class="card-title">Pending Payouts</div><div class="card-value gold" id="pendingPayouts">$0</div></div>
                 </div>
 
-                <!-- Network Stats with Names -->
-                <h3 style="color:var(--sub); margin-bottom:10px;">📊 Ads Watched Per Network</h3>
-                <div class="network-stats-grid">
-                    <div class="network-card network-1">
-                        <div class="network-icon">🔵</div>
-                        <div class="network-name">Monetag</div>
-                        <div class="network-ads blue" id="network1Ads">0</div>
-                        <div class="network-users" id="network1Users">0 users</div>
-                        <div class="network-detail" id="network1Detail">📺 0 ads</div>
-                    </div>
-                    <div class="network-card network-2">
-                        <div class="network-icon">🟣</div>
-                        <div class="network-name">Adsterra</div>
-                        <div class="network-ads purple" id="network2Ads">0</div>
-                        <div class="network-users" id="network2Users">0 users</div>
-                        <div class="network-detail" id="network2Detail">📺 0 ads</div>
-                    </div>
-                    <div class="network-card network-3">
-                        <div class="network-icon">🩷</div>
-                        <div class="network-name">Hilltop</div>
-                        <div class="network-ads pink" id="network3Ads">0</div>
-                        <div class="network-users" id="network3Users">0 users</div>
-                        <div class="network-detail" id="network3Detail">📺 0 ads</div>
-                    </div>
-                </div>
-
-                <!-- Network Breakdown in Users Table -->
                 <div class="table-container">
                     <h4 style="margin-bottom:10px; color:var(--sub);">Recent Users</h4>
-                    <table><thead><tr><th>User</th><th>Ads</th><th>Balance</th><th>Network Usage</th><th>Rank</th></tr></thead><tbody id="userTableBody"></tbody></table>
+                    <table><thead><tr><th>User</th><th>Ads</th><th>Balance</th><th>Rank</th></tr></thead><tbody id="userTableBody"></tbody></table>
                 </div>
             </div>
 
@@ -280,10 +235,9 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Name</th>
-                                <th>Total Ads</th>
+                                <th>Ads</th>
                                 <th>Balance</th>
                                 <th>Referrals</th>
-                                <th>Network Breakdown</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -292,43 +246,38 @@
                 </div>
             </div>
 
-            <!-- DELETED USERS LOG -->
+            <!-- DELETED -->
             <div id="deleted" class="page">
-                <h2 style="margin-bottom: 15px; color:var(--gold);">🗑️ Deleted Users Log</h2>
-                <div style="background:var(--card); padding:12px; border-radius:12px; border:1px solid var(--border); margin-bottom:15px;">
-                    <p style="color:var(--sub); font-size:13px;">⚠️ This log shows users who have been permanently deleted from the system.</p>
-                </div>
-                <div id="deletedUsersContainer" style="display:flex; flex-direction:column; gap:6px;"></div>
+                <h2 style="margin-bottom: 15px; color:var(--gold);">🗑️ Deleted Users</h2>
+                <div id="deletedUsersContainer"></div>
             </div>
 
             <!-- REFERRALS -->
             <div id="referrals" class="page">
-                <h2 style="margin-bottom: 15px; color:var(--gold);">📎 Referral Network</h2>
-                <div style="background:var(--card); padding:15px; border-radius:16px; border:1px solid var(--border); margin-bottom:20px;">
-                    <p style="color:var(--sub);">Every user and the friends they invited.</p>
-                </div>
-                <div id="referralNetworkContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
+                <h2 style="margin-bottom: 15px; color:var(--gold);">🔗 Referral Network</h2>
+                <div id="referralNetworkContainer"></div>
             </div>
 
             <!-- PAYOUTS -->
             <div id="payouts" class="page">
-                <h2 style="margin-bottom: 15px; color:var(--gold);">💸 Payout Requests</h2>
+                <h2 style="margin-bottom: 15px; color:var(--gold);">💸 Payouts</h2>
                 <div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap;">
-                    <button class="btn-blue" style="width:auto; padding:8px 20px;" onclick="filterPayouts('pending')">⏳ Pending</button>
-                    <button class="btn-green" style="width:auto; padding:8px 20px;" onclick="filterPayouts('paid')">✅ Paid</button>
-                    <button class="btn-gold" style="width:auto; padding:8px 20px;" onclick="filterPayouts('all')">📋 All</button>
+                    <button class="btn-blue" style="width:auto; padding:8px 20px;" onclick="filterPayouts('pending')">Pending</button>
+                    <button class="btn-green" style="width:auto; padding:8px 20px;" onclick="filterPayouts('paid')">Paid</button>
+                    <button class="btn-red" style="width:auto; padding:8px 20px;" onclick="filterPayouts('rejected')">Rejected</button>
+                    <button class="btn-gold" style="width:auto; padding:8px 20px;" onclick="filterPayouts('all')">All</button>
                 </div>
-                <div id="payoutContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
+                <div id="payoutContainer"></div>
             </div>
 
             <!-- ANNOUNCE -->
             <div id="announce" class="page">
-                <h2 style="margin-bottom: 15px; color:var(--gold);">Send Announcement</h2>
-                <div style="background:var(--card); padding:20px; border-radius:16px; border:1px solid var(--border); margin-bottom:20px;">
-                    <textarea id="announceMsg" placeholder="Write message to all users..." rows="4" style="resize:none;"></textarea>
+                <h2 style="margin-bottom: 15px; color:var(--gold);">📢 Announce</h2>
+                <div style="background:var(--card); padding:20px; border-radius:16px; border:1px solid var(--border);">
+                    <textarea id="announceMsg" placeholder="Write message..." rows="4" style="resize:none;"></textarea>
                     <button class="btn-gold" onclick="sendAnnouncement()">Send to Users</button>
                 </div>
-                <div style="background:var(--card); padding:15px; border-radius:16px; border:1px solid var(--border);">
+                <div style="margin-top:20px; background:var(--card); padding:15px; border-radius:16px; border:1px solid var(--border);">
                     <h4 style="color:var(--sub); margin-bottom:10px;">Previous</h4>
                     <ul id="announceList" style="list-style:none;"></ul>
                 </div>
@@ -346,7 +295,7 @@
                         <div id="chatHeader" style="color:var(--sub); border-bottom:1px solid var(--border); padding-bottom:10px; margin-bottom:10px;">Select a user</div>
                         <div id="chatMessages" class="chat-messages"></div>
                         <div class="chat-input-area">
-                            <input type="text" id="adminReplyInput" placeholder="Type message as Admin..." style="flex:1; margin:0;">
+                            <input type="text" id="adminReplyInput" placeholder="Type message..." style="flex:1; margin:0;">
                             <button class="btn-gold" onclick="sendAdminReply()" style="padding:0 20px; width:auto;">Send</button>
                         </div>
                     </div>
@@ -367,19 +316,21 @@
 
             <!-- SETTINGS -->
             <div id="settings" class="page">
-                <h2 style="margin-bottom: 15px; color:var(--gold);">Settings</h2>
+                <h2 style="margin-bottom: 15px; color:var(--gold);">⚙️ Settings</h2>
                 <div style="background:var(--card); padding:20px; border-radius:16px; border:1px solid var(--border); max-width:500px;">
                     <h4 style="color:var(--sub); margin-bottom:15px;">Change Password</h4>
                     <input type="password" id="newPass" placeholder="New Password">
-                    <input type="password" id="confPass" placeholder="Confirm New Password">
-                    <button class="btn-blue" onclick="changeAdminPassword()" style="width:100%;">Update Password</button>
+                    <input type="password" id="confPass" placeholder="Confirm">
+                    <button class="btn-blue" onclick="changeAdminPassword()">Update Password</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- FIREBASE ---
+        // ============================================
+        // FIREBASE
+        // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyAIvkzIWM-0giOeJjoiYHv6Sgkb9VC70GE",
             authDomain: "ads-arena-850c5.firebaseapp.com",
@@ -392,39 +343,59 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // --- TOAST ---
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = 'toast' + (isError ? ' error' : '');
-            toast.style.display = 'block';
-            clearTimeout(toast._timeout);
-            toast._timeout = setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        const MIN_WITHDRAW = 2.00;
+        const ADS_FOR_WITHDRAW = 5000;
+
+        // ============================================
+        // HELPERS
+        // ============================================
+        function showToast(msg, error = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast' + (error ? ' error' : '');
+            t.style.display = 'block';
+            clearTimeout(t._timeout);
+            t._timeout = setTimeout(() => t.style.display = 'none', 3000);
         }
 
-        // --- LOGIN ---
+        function calcBalance(ads) { return (ads / ADS_FOR_WITHDRAW) * MIN_WITHDRAW; }
+
+        // ============================================
+        // LOGIN
+        // ============================================
         function adminLogin() {
             const email = document.getElementById('adminEmail').value.trim();
             const pass = document.getElementById('adminPassword').value.trim();
             const errorBox = document.getElementById('loginError');
-            const loginBtn = document.getElementById('loginBtn');
+            const btn = document.getElementById('loginBtn');
             const spinner = document.getElementById('loadingSpinner');
 
             errorBox.innerText = "";
-            if(!email || !pass) { errorBox.innerText = "Enter credentials."; return; }
+            if (!email || !pass) { errorBox.innerText = "Enter credentials."; return; }
 
-            spinner.style.display = 'flex'; loginBtn.disabled = true; loginBtn.innerText = "Logging...";
+            spinner.style.display = 'flex';
+            btn.disabled = true;
+            btn.innerText = "Logging...";
 
             auth.signInWithEmailAndPassword(email, pass)
                 .then(() => {
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('dashboardApp').style.display = 'flex';
-                    loginBtn.disabled = false; loginBtn.innerText = "Login"; spinner.style.display = 'none';
+                    btn.disabled = false;
+                    btn.innerText = "Login";
+                    spinner.style.display = 'none';
+                    loadAllData();
                 })
-                .catch((error) => {
-                    spinner.style.display = 'none'; loginBtn.disabled = false; loginBtn.innerText = "Login";
-                    errorBox.innerText = "❌ Access Denied. Check credentials.";
+                .catch(() => {
+                    spinner.style.display = 'none';
+                    btn.disabled = false;
+                    btn.innerText = "Login";
+                    errorBox.innerText = "❌ Access Denied.";
                 });
+        }
+
+        function adminLogout() {
+            if (confirm("Logout?")) { auth.signOut().then(() => location.reload()); }
         }
 
         function toggleTheme() {
@@ -438,610 +409,438 @@
             document.getElementById('sidebarOverlay').classList.toggle('open');
         }
 
-        function switchPage(pageId, el) {
+        function switchPage(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
+            document.getElementById(id).classList.add('active');
             document.querySelectorAll('.sidebar ul li').forEach(li => li.classList.remove('active'));
-            if(el) el.classList.add('active');
+            if (el) el.classList.add('active');
             toggleSidebar();
-            if(pageId === 'messages') loadMessages();
-            if(pageId === 'groupchat') loadAdminGroupChat();
-            if(pageId === 'referrals') loadReferralNetwork();
-            if(pageId === 'payouts') loadPayouts();
-            if(pageId === 'deleted') loadDeletedUsers();
+            if (id === 'messages') loadMessages();
+            if (id === 'groupchat') loadGroupChat();
+            if (id === 'referrals') loadReferrals();
+            if (id === 'payouts') loadPayouts();
+            if (id === 'deleted') loadDeleted();
         }
 
-        function adminLogout() {
-            if(confirm("Logout?")) { auth.signOut().then(() => { location.reload(); }); }
+        // ============================================
+        // LOAD ALL DATA - FIXED
+        // ============================================
+        function loadAllData() {
+            console.log('Loading all data...');
+
+            // Load users
+            db.collection("users").onSnapshot((snapshot) => {
+                console.log('Users found:', snapshot.size);
+                let users = [];
+                let totalAds = 0;
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    users.push({ id: doc.id, ...data });
+                    totalAds += (data.ads_watched || 0);
+                });
+
+                // Sort by ads
+                users.sort((a, b) => (b.ads_watched || 0) - (a.ads_watched || 0));
+
+                // Dashboard - recent users
+                let recentHtml = '';
+                users.slice(0, 10).forEach((u, i) => {
+                    const name = u.first_name || u.username || u.telegram_id || 'User';
+                    const balance = calcBalance(u.ads_watched || 0);
+                    recentHtml += `<tr>
+                        <td>${name}</td>
+                        <td>${u.ads_watched || 0}</td>
+                        <td class="balance-usd">$${balance.toFixed(2)}</td>
+                        <td><span class="rank-badge">#${i + 1}</span></td>
+                    </tr>`;
+                });
+                document.getElementById('userTableBody').innerHTML = recentHtml || '<tr><td colspan="4" class="no-data">No users</td></tr>';
+
+                // All users
+                let allHtml = '';
+                users.forEach(u => {
+                    const name = u.first_name || u.username || u.telegram_id || 'User';
+                    const balance = calcBalance(u.ads_watched || 0);
+                    allHtml += `<tr>
+                        <td>${u.telegram_id || 'N/A'}</td>
+                        <td>${name}</td>
+                        <td><strong>${u.ads_watched || 0}</strong></td>
+                        <td class="balance-usd">$${balance.toFixed(2)}</td>
+                        <td>${u.referrals || 0}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editUserAds('${u.id}', ${u.ads_watched || 0})">✏️</button>
+                            <button class="btn-delete" onclick="deleteUser('${u.id}', '${name.replace(/'/g, "\\'")}')">🗑️</button>
+                        </td>
+                    </tr>`;
+                });
+                document.getElementById('allUsersBody').innerHTML = allHtml || '<tr><td colspan="6" class="no-data">No users found</td></tr>';
+
+                // Stats
+                document.getElementById('totalUsers').innerText = users.length;
+                document.getElementById('totalAds').innerText = totalAds;
+            }, (error) => {
+                console.error('Error loading users:', error);
+                showToast('Error loading users: ' + error.message, true);
+            });
+
+            // Load deleted count
+            db.collection("deleted_users").get().then(snap => {
+                document.getElementById('totalDeleted').innerText = snap.size;
+            }).catch(() => {});
+
+            // Load pending payouts
+            db.collection("withdrawals").where("status", "==", "pending").get().then(snap => {
+                let total = 0;
+                snap.forEach(doc => { total += (doc.data().amount || 0); });
+                document.getElementById('pendingPayouts').innerText = '$' + total.toFixed(2);
+            }).catch(() => {});
         }
 
-        // Helper: calculate USD balance from ads
-        function calculateUserBalance(ads) {
-            return (ads / 2000) * 1;
+        // ============================================
+        // USER ACTIONS
+        // ============================================
+        function editUserAds(userId, currentAds) {
+            const newAds = prompt('Enter new ad count:', currentAds);
+            if (newAds === null) return;
+            const num = parseInt(newAds);
+            if (isNaN(num) || num < 0) { showToast('Invalid number', true); return; }
+            db.collection("users").doc(userId).update({ ads_watched: num })
+                .then(() => showToast('✅ Updated!'))
+                .catch(err => showToast('Error: ' + err.message, true));
         }
 
-        // --- DELETE USER (with logging) ---
         function deleteUser(userId, userName) {
-            if (!confirm(`⚠️ Are you sure you want to delete user "${userName}"?\n\nThis action CANNOT be undone!\nAll their data will be permanently removed.`)) {
-                return;
-            }
-            
-            showToast(`Deleting user ${userName}...`);
-            
+            if (!confirm(`Delete "${userName}"? This cannot be undone!`)) return;
+            showToast('Deleting...');
+
             const adminEmail = auth.currentUser ? auth.currentUser.email : 'unknown';
-            
-            db.collection("users").doc(userId).get().then((doc) => {
-                if (!doc.exists) {
-                    showToast('User not found.', true);
-                    return;
-                }
-                const userData = doc.data();
-                
-                const deletionLog = {
+
+            db.collection("users").doc(userId).get().then(doc => {
+                if (!doc.exists) { showToast('User not found', true); return; }
+                const data = doc.data();
+
+                const log = {
                     user_id: userId,
                     user_name: userName,
-                    telegram_id: userData.telegram_id || 'N/A',
-                    ads_watched: userData.ads_watched || 0,
-                    referrals: userData.referrals || 0,
-                    balance: calculateUserBalance(userData.ads_watched || 0),
+                    telegram_id: data.telegram_id || 'N/A',
+                    ads_watched: data.ads_watched || 0,
+                    referrals: data.referrals || 0,
+                    balance: calcBalance(data.ads_watched || 0),
                     deleted_by: adminEmail,
                     deleted_at: firebase.firestore.FieldValue.serverTimestamp()
                 };
-                
-                const promises = [
+
+                Promise.all([
                     db.collection("users").doc(userId).delete(),
-                    db.collection("withdrawals").where("user_id", "==", userId).get().then(snap => {
-                        const batch = db.batch();
-                        snap.forEach(doc => batch.delete(doc.ref));
-                        return batch.commit();
+                    db.collection("withdrawals").where("user_id", "==", userId).get().then(s => {
+                        const b = db.batch();
+                        s.forEach(d => b.delete(d.ref));
+                        return b.commit();
                     }),
-                    db.collection("admin_inbox").where("telegram_id", "==", userId).get().then(snap => {
-                        const batch = db.batch();
-                        snap.forEach(doc => batch.delete(doc.ref));
-                        return batch.commit();
+                    db.collection("admin_inbox").where("telegram_id", "==", userId).get().then(s => {
+                        const b = db.batch();
+                        s.forEach(d => b.delete(d.ref));
+                        return b.commit();
                     }),
-                    db.collection("groupchat").where("user_id", "==", userId).get().then(snap => {
-                        const batch = db.batch();
-                        snap.forEach(doc => batch.delete(doc.ref));
-                        return batch.commit();
-                    }),
-                    db.collection("deleted_users").add(deletionLog)
-                ];
-                
-                Promise.all(promises)
-                    .then(() => {
-                        showToast(`✅ User "${userName}" deleted successfully!`);
-                    })
-                    .catch((err) => {
-                        console.error("Error deleting user:", err);
-                        showToast(`❌ Error deleting user: ${err.message}`, true);
-                    });
-            }).catch((err) => {
-                showToast(`❌ Error: ${err.message}`, true);
+                    db.collection("deleted_users").add(log)
+                ]).then(() => showToast('✅ Deleted!'))
+                    .catch(err => showToast('Error: ' + err.message, true));
             });
         }
 
-        // --- LOAD DELETED USERS ---
-        function loadDeletedUsers() {
+        // ============================================
+        // DELETED USERS
+        // ============================================
+        function loadDeleted() {
             const container = document.getElementById('deletedUsersContainer');
-            container.innerHTML = '<div style="color:var(--sub); text-align:center; padding:20px;">Loading deleted users log...</div>';
+            container.innerHTML = '<div class="loading-text">Loading...</div>';
 
-            db.collection("deleted_users")
-                .orderBy("deleted_at", "desc")
-                .onSnapshot((snap) => {
-                    let html = '';
-                    let hasData = false;
-
-                    snap.forEach(doc => {
-                        const data = doc.data();
-                        hasData = true;
-                        const time = data.deleted_at ? new Date(data.deleted_at.toDate()).toLocaleString() : 'Unknown time';
-                        
-                        html += `
-                            <div class="deleted-user-item">
-                                <div>
-                                    <span class="del-name">${data.user_name || 'Unknown User'}</span>
-                                    <span class="del-info">ID: ${data.telegram_id || 'N/A'}</span>
-                                </div>
-                                <div>
-                                    <span class="del-info">📺 ${data.ads_watched || 0} ads</span>
-                                    <span class="del-info">💰 $${(data.balance || 0).toFixed(2)}</span>
-                                    <span class="del-info">👤 ${data.referrals || 0} referrals</span>
-                                </div>
-                                <div>
-                                    <span class="del-info">🗑️ By: ${data.deleted_by || 'Unknown'}</span>
-                                    <span class="del-info">⏰ ${time}</span>
-                                </div>
-                            </div>
-                        `;
-                    });
-
-                    if (!hasData) {
-                        container.innerHTML = '<div style="color:var(--sub); text-align:center; padding:20px;">No deleted users logged yet.</div>';
-                    } else {
-                        container.innerHTML = html;
-                    }
-                });
-        }
-
-        // --- EDIT ADS FUNCTION ---
-        function editUserAds(userId, currentAds) {
-            const newAds = prompt(`Enter new number of ads watched for this user:`, currentAds);
-            if (newAds === null) return;
-            const numAds = parseInt(newAds);
-            if (isNaN(numAds) || numAds < 0) {
-                showToast('❌ Please enter a valid number (0 or greater).', true);
-                return;
-            }
-            db.collection("users").doc(userId).update({
-                ads_watched: numAds
-            }).then(() => {
-                showToast(`✅ Ads updated to ${numAds}!`);
-            }).catch((err) => {
-                showToast('❌ Error updating: ' + err.message, true);
-            });
-        }
-
-        // --- GET NETWORK BREAKDOWN HTML ---
-        function getNetworkBreakdownHTML(adCounts) {
-            if (!adCounts) return '<span style="color:var(--sub); font-size:11px;">No data</span>';
-            
-            const n1 = adCounts.network1 || 0;
-            const n2 = adCounts.network2 || 0;
-            const n3 = adCounts.network3 || 0;
-            
-            const total = n1 + n2 + n3;
-            if (total === 0) return '<span style="color:var(--sub); font-size:11px;">No ads</span>';
-            
-            return `
-                <span class="network-tag n1">Monetag: ${n1}</span>
-                <span class="network-tag n2">Adsterra: ${n2}</span>
-                <span class="network-tag n3">Hilltop: ${n3}</span>
-            `;
-        }
-
-        function getNetworkWithMostAds(adCounts) {
-            if (!adCounts) return 'None';
-            const networks = [
-                { key: 'network1', name: 'Monetag', color: 'n1' },
-                { key: 'network2', name: 'Adsterra', color: 'n2' },
-                { key: 'network3', name: 'Hilltop', color: 'n3' }
-            ];
-            let max = 0;
-            let best = { name: 'None', color: '' };
-            networks.forEach(n => {
-                const count = adCounts[n.key] || 0;
-                if (count > max) {
-                    max = count;
-                    best = n;
-                }
-            });
-            return max > 0 ? `<span class="network-tag ${best.color}">${best.name}</span>` : 'None';
-        }
-
-        // --- DASHBOARD & USERS ---
-        db.collection("users").onSnapshot((snapshot) => {
-            let totalUsers = 0, totalAds = 0, totalRef = 0;
-            let usersHtml = '', allUsersHtml = '';
-            let usersArray = [];
-            
-            // Network counters
-            let network1Total = 0;
-            let network2Total = 0;
-            let network3Total = 0;
-            let network1Users = 0;
-            let network2Users = 0;
-            let network3Users = 0;
-            
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                if (data.telegram_id && !data.telegram_id.startsWith("test_")) {
-                    usersArray.push({id: doc.id, ...data});
-                }
-            });
-
-            usersArray.sort((a,b) => (b.ads_watched||0) - (a.ads_watched||0));
-
-            usersArray.forEach((data, index) => {
-                totalUsers++;
-                totalAds += (data.ads_watched||0);
-                totalRef += (data.referrals||0);
-                let name = data.first_name || data.username || 'Anonymous';
-                const balance = calculateUserBalance(data.ads_watched || 0);
-                const balanceStr = balance.toFixed(2);
-                const ads = data.ads_watched || 0;
-                
-                // Get network counts
-                const adCounts = data.ad_counts || {};
-                const n1 = adCounts.network1 || 0;
-                const n2 = adCounts.network2 || 0;
-                const n3 = adCounts.network3 || 0;
-                
-                network1Total += n1;
-                network2Total += n2;
-                network3Total += n3;
-                
-                if (n1 > 0) network1Users++;
-                if (n2 > 0) network2Users++;
-                if (n3 > 0) network3Users++;
-                
-                const networkBreakdown = getNetworkBreakdownHTML(adCounts);
-                const topNetwork = getNetworkWithMostAds(adCounts);
-                
-                if(index < 10) {
-                    usersHtml += `<tr>
-                        <td>${name}</td>
-                        <td>${ads}</td>
-                        <td class="balance-usd">$${balanceStr}</td>
-                        <td>${topNetwork}</td>
-                        <td><span class="rank-badge">#${index+1}</span></td>
-                    </tr>`;
-                }
-                
-                allUsersHtml += `<tr>
-                    <td>${data.telegram_id||'N/A'}</td>
-                    <td>${name}</td>
-                    <td><strong>${ads}</strong></td>
-                    <td class="balance-usd">$${balanceStr}</td>
-                    <td>${data.referrals||0}</td>
-                    <td style="font-size:11px; min-width:120px;">${networkBreakdown}</td>
-                    <td>
-                        <div class="user-actions">
-                            <button class="btn-edit" onclick="editUserAds('${data.id}', ${ads})">✏️ Edit</button>
-                            <button class="btn-delete" onclick="deleteUser('${data.id}', '${name.replace(/'/g, "\\'")}')">🗑️ Delete</button>
+            db.collection("deleted_users").orderBy("deleted_at", "desc").onSnapshot(snap => {
+                let html = '';
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const time = d.deleted_at ? new Date(d.deleted_at.toDate()).toLocaleString() : 'Unknown';
+                    html += `
+                        <div class="deleted-user-item">
+                            <div><span class="del-name">${d.user_name || 'Unknown'}</span> <span class="del-info">ID: ${d.telegram_id || 'N/A'}</span></div>
+                            <div><span class="del-info">📺 ${d.ads_watched || 0} ads</span> <span class="del-info">💰 $${(d.balance || 0).toFixed(2)}</span></div>
+                            <div><span class="del-info">🗑️ ${d.deleted_by || 'Unknown'}</span> <span class="del-info">⏰ ${time}</span></div>
                         </div>
-                    </td>
-                </tr>`;
+                    `;
+                });
+                container.innerHTML = html || '<div class="no-data">No deleted users.</div>';
             });
+        }
 
-            // Update network stats with names
-            document.getElementById('network1Ads').innerText = network1Total;
-            document.getElementById('network2Ads').innerText = network2Total;
-            document.getElementById('network3Ads').innerText = network3Total;
-            document.getElementById('network1Users').innerText = network1Users + ' users';
-            document.getElementById('network2Users').innerText = network2Users + ' users';
-            document.getElementById('network3Users').innerText = network3Users + ' users';
-            
-            // Add details
-            document.getElementById('network1Detail').innerHTML = `📺 ${network1Total} ads from ${network1Users} users`;
-            document.getElementById('network2Detail').innerHTML = `📺 ${network2Total} ads from ${network2Users} users`;
-            document.getElementById('network3Detail').innerHTML = `📺 ${network3Total} ads from ${network3Users} users`;
-
-            document.getElementById('totalUsers').innerText = totalUsers;
-            document.getElementById('totalAds').innerText = totalAds;
-            document.getElementById('userTableBody').innerHTML = usersHtml || '<tr><td colspan="5">No users</td></tr>';
-            document.getElementById('allUsersBody').innerHTML = allUsersHtml || '<tr><td colspan="7">No users</td></tr>';
-            
-            // Update deleted count
-            db.collection("deleted_users").get().then(snap => {
-                document.getElementById('totalDeleted').innerText = snap.size;
-            });
-        });
-
-        // --- REFERRAL NETWORK ---
-        function loadReferralNetwork() {
+        // ============================================
+        // REFERRALS
+        // ============================================
+        function loadReferrals() {
             const container = document.getElementById('referralNetworkContainer');
-            container.innerHTML = '<div style="color:var(--sub);">Loading network...</div>';
+            container.innerHTML = '<div class="loading-text">Loading...</div>';
 
-            db.collection("users").get().then((snapshot) => {
-                let usersMap = {};
-                let usersArray = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.telegram_id && !data.telegram_id.startsWith("test_")) {
-                        usersMap[doc.id] = { id: doc.id, ...data };
-                        usersArray.push(doc.id);
-                    }
+            db.collection("users").get().then(snap => {
+                const users = {};
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    users[doc.id] = { id: doc.id, ...d };
                 });
 
                 let html = '';
-                usersArray.forEach(uid => {
-                    const user = usersMap[uid];
-                    if (!user) return;
-                    const name = user.first_name || user.username || 'Anonymous';
+                for (let id in users) {
+                    const u = users[id];
                     const refs = [];
-                    for (let key in usersMap) {
-                        if (usersMap[key].referred_by === uid) {
-                            refs.push(usersMap[key]);
-                        }
+                    for (let key in users) {
+                        if (users[key].referred_by === id) refs.push(users[key]);
                     }
-                    
-                    const balance = calculateUserBalance(user.ads_watched || 0);
-                    
+                    const name = u.first_name || u.username || u.telegram_id || 'User';
+                    const balance = calcBalance(u.ads_watched || 0);
                     html += `
                         <div class="ref-user-block">
                             <div class="ref-main">
-                                <div><strong>👤 ${name}</strong> <span style="color:var(--sub); font-size:13px;">${user.telegram_id || ''}</span></div>
-                                <div style="color:var(--gold); font-size:13px;">${refs.length} referrals | Balance: $${balance.toFixed(2)}</div>
+                                <div><strong>👤 ${name}</strong> <span style="color:var(--sub); font-size:13px;">${u.telegram_id || ''}</span></div>
+                                <div style="color:var(--gold);">${refs.length} referrals | $${balance.toFixed(2)}</div>
                             </div>
                             <div class="ref-list-inline">
-                                ${refs.length > 0 ? refs.map(r => `<span class="ref-tag">${r.first_name || r.username || 'User'}</span>`).join('') : '<span style="color:var(--sub); font-size:12px;">No referrals yet</span>'}
+                                ${refs.length > 0 ? refs.map(r => `<span class="ref-tag">${r.first_name || r.username || 'User'}</span>`).join('') : '<span style="color:var(--sub);">No referrals</span>'}
                             </div>
                         </div>
                     `;
-                });
-
-                container.innerHTML = html || '<div style="color:var(--sub);">No users found.</div>';
-            }).catch((err) => {
-                container.innerHTML = '<div style="color:var(--red);">Error loading network.</div>';
-                console.error(err);
+                }
+                container.innerHTML = html || '<div class="no-data">No users found.</div>';
+            }).catch(err => {
+                container.innerHTML = '<div class="no-data">Error loading: ' + err.message + '</div>';
             });
         }
 
-        // --- PAYOUT SYSTEM ---
-        let currentFilter = 'pending';
+        // ============================================
+        // PAYOUTS
+        // ============================================
+        let payoutFilter = 'pending';
 
-        function filterPayouts(filter) {
-            currentFilter = filter;
-            loadPayouts();
-        }
+        function filterPayouts(f) { payoutFilter = f;
+            loadPayouts(); }
 
         function loadPayouts() {
             const container = document.getElementById('payoutContainer');
-            container.innerHTML = '<div style="color:var(--sub);">Loading payouts...</div>';
+            container.innerHTML = '<div class="loading-text">Loading...</div>';
 
-            db.collection("withdrawals").orderBy("timestamp", "desc").onSnapshot((snap) => {
+            db.collection("withdrawals").orderBy("timestamp", "desc").onSnapshot(snap => {
                 let html = '';
-                let pendingTotal = 0;
                 let hasData = false;
 
                 snap.forEach(doc => {
-                    const data = doc.data();
-                    const id = doc.id;
-                    const status = data.status || 'pending';
-                    if (currentFilter !== 'all' && status !== currentFilter) return;
+                    const d = doc.data();
+                    const status = d.status || 'pending';
+                    if (payoutFilter !== 'all' && status !== payoutFilter) return;
                     hasData = true;
 
-                    if (status === 'pending') pendingTotal += (data.amount || 0);
-
-                    const userName = data.user_name || 'User';
-                    const phone = data.phone || 'No phone';
-                    const amount = data.amount || 0;
-                    const timestamp = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : '';
+                    const time = d.timestamp ? new Date(d.timestamp.toDate()).toLocaleString() : '';
+                    const badgeClass = status === 'pending' ? 'badge-pending' : status === 'paid' ? 'badge-paid' : 'badge-rejected';
 
                     html += `
                         <div style="background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px;">
-                            <div style="flex:2; min-width:180px;">
-                                <div><strong>${userName}</strong> <span style="color:var(--sub); font-size:13px;">${data.telegram_id || ''}</span></div>
-                                <div style="color:var(--sub); font-size:13px;">📱 ${phone}</div>
-                                <div style="color:var(--sub); font-size:12px;">${timestamp}</div>
-                            </div>
-                            <div style="font-weight:bold; color:var(--gold); font-size:18px;">$${amount.toFixed(2)}</div>
                             <div>
-                                <span class="${status === 'pending' ? 'badge-pending' : 'badge-paid'}">${status.toUpperCase()}</span>
+                                <div><strong>${d.user_name || 'User'}</strong> <span style="color:var(--sub);">${d.telegram_id || ''}</span></div>
+                                <div style="color:var(--sub);">📱 ${d.phone || 'No phone'}</div>
+                                <div style="color:var(--sub); font-size:12px;">${time}</div>
                             </div>
-                            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                            <div style="font-weight:bold; color:var(--gold); font-size:18px;">$${(d.amount || 0).toFixed(2)}</div>
+                            <div><span class="${badgeClass}">${status.toUpperCase()}</span></div>
+                            <div>
                                 ${status === 'pending' ? `
-                                    <button class="btn-green btn-sm" onclick="markPaid('${id}', '${userName}', ${amount})">✅ Pay</button>
-                                    <button class="btn-red btn-sm" onclick="rejectPayout('${id}')">❌ Reject</button>
-                                ` : `
-                                    <span style="color:var(--green); font-size:13px;">✅ Paid</span>
-                                `}
+                                    <button class="btn-green btn-sm" onclick="markPaid('${doc.id}', '${d.user_name || 'User'}', ${d.amount || 0})">✅ Pay</button>
+                                    <button class="btn-red btn-sm" onclick="rejectPayout('${doc.id}')">❌ Reject</button>
+                                ` : `<span style="color:var(--green);">${status === 'paid' ? '✅ Paid' : '❌ Rejected'}</span>`}
                             </div>
                         </div>
                     `;
                 });
 
-                document.getElementById('pendingPayouts').innerText = '$' + pendingTotal.toFixed(2);
-
-                if (!hasData) {
-                    container.innerHTML = '<div style="color:var(--sub); text-align:center; padding:30px;">No payouts in this category.</div>';
-                } else {
-                    container.innerHTML = html;
-                }
+                container.innerHTML = hasData ? html : '<div class="no-data">No payouts.</div>';
             });
         }
 
-        function markPaid(payoutId, userName, amount) {
-            if (!confirm(`Confirm payment of $${amount.toFixed(2)} to ${userName}?`)) return;
-
-            db.collection("withdrawals").doc(payoutId).get().then((doc) => {
-                if (!doc.exists) return alert("Payout not found.");
+        function markPaid(id, name, amount) {
+            if (!confirm(`Pay $${amount.toFixed(2)} to ${name}?`)) return;
+            db.collection("withdrawals").doc(id).get().then(doc => {
+                if (!doc.exists) return;
                 const data = doc.data();
-                const userId = data.telegram_id;
-                const userPhone = data.phone || '';
-
-                db.collection("withdrawals").doc(payoutId).update({
-                    status: 'paid',
-                    paid_at: firebase.firestore.FieldValue.serverTimestamp()
-                }).then(() => {
-                    if (userId) {
-                        db.collection("admin_inbox").add({
-                            telegram_id: userId,
-                            message: `✅ Your withdrawal of $${amount.toFixed(2)} has been approved and paid. (Phone: ${userPhone})`,
-                            from_admin: true,
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                        }).then(() => {
-                            showToast(`✅ Payment of $${amount.toFixed(2)} to ${userName} marked as PAID.`);
-                        }).catch((err) => {
-                            showToast(`Payment recorded but failed to send notification: ${err.message}`, true);
-                        });
-                    } else {
-                        showToast(`✅ Payment of $${amount.toFixed(2)} marked as PAID.`);
-                    }
-                }).catch((err) => {
-                    showToast("Error updating payout: " + err.message, true);
-                });
-            }).catch((err) => {
-                showToast("Error fetching payout: " + err.message, true);
+                db.collection("withdrawals").doc(id).update({ status: 'paid', paid_at: firebase.firestore.FieldValue.serverTimestamp() })
+                    .then(() => {
+                        if (data.telegram_id) {
+                            db.collection("admin_inbox").add({
+                                telegram_id: data.telegram_id,
+                                message: `✅ Your withdrawal of $${amount.toFixed(2)} has been paid.`,
+                                from_admin: true,
+                                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        }
+                        showToast('✅ Paid!');
+                    });
             });
         }
 
-        function rejectPayout(payoutId) {
-            if (!confirm("Reject this payout request?")) return;
-            db.collection("withdrawals").doc(payoutId).get().then((doc) => {
-                if (!doc.exists) return alert("Payout not found.");
+        function rejectPayout(id) {
+            if (!confirm('Reject this payout?')) return;
+            db.collection("withdrawals").doc(id).get().then(doc => {
+                if (!doc.exists) return;
                 const data = doc.data();
-                const userId = data.telegram_id;
-                const amount = data.amount || 0;
-
-                db.collection("withdrawals").doc(payoutId).update({
-                    status: 'rejected'
-                }).then(() => {
-                    if (userId) {
-                        db.collection("admin_inbox").add({
-                            telegram_id: userId,
-                            message: `❌ Your withdrawal request of $${amount.toFixed(2)} was rejected. Please contact support.`,
-                            from_admin: true,
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                        }).then(() => {
-                            showToast("Payout rejected. User notified.");
-                        });
-                    } else {
-                        showToast("Payout rejected.");
-                    }
-                });
+                db.collection("withdrawals").doc(id).update({ status: 'rejected', rejected_at: firebase.firestore.FieldValue.serverTimestamp() })
+                    .then(() => {
+                        if (data.telegram_id) {
+                            db.collection("admin_inbox").add({
+                                telegram_id: data.telegram_id,
+                                message: `❌ Your withdrawal request was rejected.`,
+                                from_admin: true,
+                                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        }
+                        showToast('Rejected.');
+                    });
             });
         }
 
-        // --- ANNOUNCE ---
+        // ============================================
+        // ANNOUNCEMENTS
+        // ============================================
         function sendAnnouncement() {
-            let msg = document.getElementById('announceMsg').value;
-            if(!msg.trim()) return alert("Write a message!");
+            const msg = document.getElementById('announceMsg').value.trim();
+            if (!msg) return alert('Write a message!');
             db.collection("announcements").add({
                 message: msg,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 document.getElementById('announceMsg').value = '';
-                showToast("Announcement sent!");
+                showToast('Sent!');
             });
         }
 
-        db.collection("announcements").orderBy("timestamp", "desc").onSnapshot((snap) => {
+        db.collection("announcements").orderBy("timestamp", "desc").onSnapshot(snap => {
             let html = '';
             snap.forEach(doc => {
-                let data = doc.data();
-                html += `<li style="background:var(--bg); padding:10px; margin-bottom:5px; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
-                    <span>${data.message}</span>
-                    <button class="btn-red" onclick="deleteAnnounce('${doc.id}')">Delete</button>
-                </li>`;
+                const d = doc.data();
+                const time = d.timestamp ? new Date(d.timestamp.toDate()).toLocaleString() : '';
+                html += `
+                    <li style="background:var(--bg); padding:10px; margin-bottom:5px; border-radius:5px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:5px;">
+                        <span>${d.message} <span style="color:var(--sub); font-size:11px;">${time}</span></span>
+                        <button class="btn-red" onclick="db.collection('announcements').doc('${doc.id}').delete()">Delete</button>
+                    </li>
+                `;
             });
             document.getElementById('announceList').innerHTML = html || '<li style="color:var(--sub);">No announcements</li>';
         });
 
-        function deleteAnnounce(id) { if(confirm("Delete?")) db.collection("announcements").doc(id).delete(); }
-
-        // --- PRIVATE MESSAGES ---
-        let currentChatUserId = null;
-        let messagesUnsubscribe = null;
+        // ============================================
+        // PRIVATE CHAT
+        // ============================================
+        let currentChatUser = null;
+        let chatUnsubscribe = null;
 
         function loadMessages() {
-            db.collection("admin_inbox").orderBy("timestamp", "asc").onSnapshot((snap) => {
-                const userListDiv = document.getElementById('chatUserList');
-                let usersMap = new Map();
-
+            db.collection("admin_inbox").orderBy("timestamp", "asc").onSnapshot(snap => {
+                const map = new Map();
                 snap.forEach(doc => {
-                    const data = doc.data();
-                    const uid = String(data.telegram_id);
-                    if (!usersMap.has(uid)) {
-                        usersMap.set(uid, { id: uid, lastMsg: data.message, time: data.timestamp });
-                    } else {
-                        const existing = usersMap.get(uid);
-                        if (data.timestamp && (!existing.time || data.timestamp.toDate() > existing.time.toDate())) {
-                            usersMap.set(uid, { id: uid, lastMsg: data.message, time: data.timestamp });
+                    const d = doc.data();
+                    const uid = String(d.telegram_id);
+                    if (!map.has(uid)) map.set(uid, { id: uid, lastMsg: d.message, time: d.timestamp });
+                    else {
+                        const existing = map.get(uid);
+                        if (d.timestamp && (!existing.time || d.timestamp.toDate() > existing.time.toDate())) {
+                            map.set(uid, { id: uid, lastMsg: d.message, time: d.timestamp });
                         }
                     }
                 });
 
-                let userListHtml = '';
-                usersMap.forEach((user, uid) => {
-                    const isActive = (uid === currentChatUserId) ? 'active-chat' : '';
-                    const shortId = uid.substring(0, 8);
-                    userListHtml += `<div class="chat-user-item ${isActive}" onclick="selectChatUser('${uid}')">
-                        <div style="font-weight:bold;">User ${shortId}...</div>
+                let html = '';
+                map.forEach((user, uid) => {
+                    const active = uid === currentChatUser ? 'active-chat' : '';
+                    html += `<div class="chat-user-item ${active}" onclick="selectChat('${uid}')">
+                        <div style="font-weight:bold;">User ${uid.substring(0, 8)}...</div>
                         <div style="font-size:12px; color:var(--sub); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px;">${user.lastMsg || '...'}</div>
                     </div>`;
                 });
-                userListDiv.innerHTML = userListHtml || '<div style="color:var(--sub);">No messages yet.</div>';
+                document.getElementById('chatUserList').innerHTML = html || '<div class="no-data">No messages.</div>';
 
-                if (currentChatUserId) {
-                    loadChatMessages(currentChatUserId);
-                }
+                if (currentChatUser) loadChatMessages(currentChatUser);
             });
         }
 
-        function loadChatMessages(userId) {
-            if (messagesUnsubscribe) {
-                messagesUnsubscribe();
-                messagesUnsubscribe = null;
-            }
-
-            const chatMessagesDiv = document.getElementById('chatMessages');
-            const chatHeader = document.getElementById('chatHeader');
-            chatHeader.innerText = `💬 Chat with: ${userId.substring(0, 8)}...`;
-
-            messagesUnsubscribe = db.collection("admin_inbox")
-                .where("telegram_id", "==", userId)
-                .orderBy("timestamp", "asc")
-                .onSnapshot((snap) => {
-                    let html = '';
-                    snap.forEach(doc => {
-                        const data = doc.data();
-                        const isAdmin = data.from_admin === true;
-                        const cls = isAdmin ? 'admin' : 'user';
-                        const sender = isAdmin ? '👑 Admin' : 'User';
-                        const time = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString() : '';
-                        html += `<div class="chat-message ${cls}">
-                            <strong>${sender}:</strong> ${data.message}
-                            <span class="msg-time">${time}</span>
-                        </div>`;
-                    });
-                    chatMessagesDiv.innerHTML = html || '<div style="color:var(--sub); text-align:center; padding:20px;">No messages yet.</div>';
-                    chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
-                });
-        }
-
-        function selectChatUser(userId) {
-            currentChatUserId = String(userId);
+        function selectChat(uid) {
+            currentChatUser = String(uid);
             document.querySelectorAll('.chat-user-item').forEach(el => el.classList.remove('active-chat'));
             document.querySelectorAll('.chat-user-item').forEach(el => {
-                if (el.textContent.includes(userId.substring(0, 8))) {
-                    el.classList.add('active-chat');
-                }
+                if (el.textContent.includes(uid.substring(0, 8))) el.classList.add('active-chat');
             });
-            loadChatMessages(userId);
+            loadChatMessages(uid);
+        }
+
+        function loadChatMessages(uid) {
+            if (chatUnsubscribe) { chatUnsubscribe();
+                chatUnsubscribe = null; }
+
+            const container = document.getElementById('chatMessages');
+            const header = document.getElementById('chatHeader');
+            header.innerText = `💬 Chat with: ${uid.substring(0, 8)}...`;
+
+            chatUnsubscribe = db.collection("admin_inbox")
+                .where("telegram_id", "==", uid)
+                .orderBy("timestamp", "asc")
+                .onSnapshot(snap => {
+                    let html = '';
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        const isAdmin = d.from_admin === true;
+                        html += `
+                            <div class="chat-message ${isAdmin ? 'admin' : 'user'}">
+                                <strong>${isAdmin ? '👑 Admin' : 'User'}:</strong> ${d.message}
+                                <span class="msg-time">${d.timestamp ? new Date(d.timestamp.toDate()).toLocaleTimeString() : ''}</span>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html || '<div class="no-data">No messages.</div>';
+                    container.scrollTop = container.scrollHeight;
+                });
         }
 
         function sendAdminReply() {
             const input = document.getElementById('adminReplyInput');
             const msg = input.value.trim();
-            if (!msg) return alert("Type a message.");
-            if (!currentChatUserId) return alert("Select a user first.");
+            if (!msg) return alert('Type a message.');
+            if (!currentChatUser) return alert('Select a user.');
 
             db.collection("admin_inbox").add({
-                telegram_id: currentChatUserId,
+                telegram_id: currentChatUser,
                 message: msg,
                 from_admin: true,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 input.value = '';
-            }).catch((err) => {
-                alert("Error sending message: " + err.message);
+                showToast('Sent!');
             });
         }
 
-        // --- GROUP CHAT ---
-        function loadAdminGroupChat() {
-            db.collection("groupchat").orderBy("timestamp", "asc").onSnapshot((snap) => {
+        // ============================================
+        // GROUP CHAT
+        // ============================================
+        function loadGroupChat() {
+            db.collection("groupchat").orderBy("timestamp", "asc").onSnapshot(snap => {
                 const container = document.getElementById('groupChatStream');
                 let html = '';
                 snap.forEach(doc => {
-                    const data = doc.data();
-                    const isAdmin = data.is_admin === true;
-                    const name = data.username || "Unknown";
-                    const time = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString() : "";
-                    const msgId = doc.id;
-                    
+                    const d = doc.data();
+                    const isAdmin = d.is_admin === true;
                     html += `
                         <div class="gc-msg ${isAdmin ? 'admin-msg' : ''}">
-                            <span class="g-sender">${isAdmin ? '👑 Admin' : name}</span>
-                            ${data.message}
-                            <span class="g-time">${time}</span>
-                            ${!isAdmin ? `<button class="g-delete" onclick="deleteGroupMessage('${msgId}')">✕</button>` : ''}
+                            <span class="g-sender">${isAdmin ? '👑 Admin' : (d.username || 'Unknown')}</span>
+                            ${d.message}
+                            <span class="g-time">${d.timestamp ? new Date(d.timestamp.toDate()).toLocaleTimeString() : ''}</span>
+                            ${!isAdmin ? `<button class="g-delete" onclick="deleteGroupMsg('${doc.id}')">✕</button>` : ''}
                         </div>
                     `;
                 });
-                container.innerHTML = html || '<div style="text-align:center; color:var(--sub); padding:20px;">No messages yet.</div>';
+                container.innerHTML = html || '<div style="text-align:center; color:var(--sub); padding:20px;">No messages.</div>';
                 container.scrollTop = container.scrollHeight;
             });
         }
@@ -1050,51 +849,52 @@
             const input = document.getElementById('adminGroupChatInput');
             const msg = input.value.trim();
             if (!msg) return;
-
             db.collection("groupchat").add({
                 user_id: "admin",
                 username: "Admin",
                 message: msg,
                 is_admin: true,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                input.value = '';
-            }).catch((e) => {
-                console.error("Error sending admin group message:", e);
-            });
+            }).then(() => { input.value = ''; });
         }
 
-        function deleteGroupMessage(msgId) {
-            if (confirm("Delete this user's message?")) {
-                db.collection("groupchat").doc(msgId).delete().then(() => {
-                    console.log("Message deleted");
-                }).catch((e) => {
-                    console.error("Error deleting message:", e);
-                });
+        function deleteGroupMsg(id) {
+            if (confirm('Delete this message?')) {
+                db.collection("groupchat").doc(id).delete().then(() => showToast('Deleted!'));
             }
         }
 
-        // --- SETTINGS ---
+        // ============================================
+        // SETTINGS
+        // ============================================
         function changeAdminPassword() {
             const newP = document.getElementById('newPass').value;
             const conf = document.getElementById('confPass').value;
-            if(!newP || !conf) return alert("Fill all fields.");
-            if(newP !== conf) return alert("Passwords do not match.");
-            const user = auth.currentUser;
-            if(user) {
-                user.updatePassword(newP).then(() => {
-                    alert("Password updated!");
+            if (!newP || !conf) return alert('Fill all fields.');
+            if (newP !== conf) return alert('Passwords do not match.');
+            auth.currentUser.updatePassword(newP)
+                .then(() => { alert('Password updated!');
                     document.getElementById('newPass').value = '';
-                    document.getElementById('confPass').value = '';
-                }).catch((err) => { alert("Error: " + err.message); });
-            }
+                    document.getElementById('confPass').value = ''; })
+                .catch(err => alert('Error: ' + err.message));
         }
 
-        // Initial loads
+        // ============================================
+        // INIT
+        // ============================================
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboardApp').style.display = 'flex';
+                loadAllData();
+            }
+        });
+
+        // Pre-load some data
         setTimeout(() => {
             loadPayouts();
             loadMessages();
-            loadDeletedUsers();
+            loadDeleted();
         }, 1000);
     </script>
 </body>
