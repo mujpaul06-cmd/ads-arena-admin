@@ -3,35 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ads Arena Admin Panel</title>
+    <title>Ads Arena Admin Bot</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
         :root {
-            --bg: #060b18;
-            --card: #0b1529;
-            --border: #1e293b;
-            --text: #ffffff;
-            --sub: #94a3b8;
-            --gold: #fbbf24;
-            --green: #22c55e;
-            --blue: #3b82f6;
-            --red: #ef4444;
+            --bg: #060b18; --card: #0b1529; --border: #1e293b; --text: #ffffff; --sub: #94a3b8;
+            --gold: #fbbf24; --green: #22c55e; --blue: #3b82f6; --red: #ef4444;
             --header-bg: #0b1529;
             --purple: #8b5cf6;
             --pink: #ec4899;
         }
         body.theme-golden {
-            --bg: #1a120b;
-            --card: #2a1e14;
-            --border: #4a3525;
-            --text: #f5f0ea;
-            --sub: #a89a8c;
-            --gold: #d4a373;
-            --green: #6a994e;
-            --blue: #bc6c25;
-            --red: #c1121f;
+            --bg: #1a120b; --card: #2a1e14; --border: #4a3525; --text: #f5f0ea; --sub: #a89a8c;
+            --gold: #d4a373; --green: #6a994e; --blue: #bc6c25; --red: #c1121f;
             --header-bg: #2a1e14;
             --purple: #a78bfa;
             --pink: #f472b6;
@@ -118,7 +104,7 @@
         .rank-badge { background: #334155; padding: 2px 8px; border-radius: 4px; font-size: 12px; color: var(--sub); }
         .badge-pending { background: #92400e; color: #fbbf24; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
         .badge-paid { background: #065f46; color: #34d399; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
-        .badge-rejected { background: #7f1d1d; color: #fca5a5; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+        .badge-deleted { background: #7f1d1d; color: #fca5a5; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
         .network-tag { padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
         .network-tag.n1 { background: rgba(59,130,246,0.2); color: var(--blue); }
         .network-tag.n2 { background: rgba(139,92,246,0.2); color: var(--purple); }
@@ -190,10 +176,6 @@
         .network-breakdown .nb1 { color: var(--blue); }
         .network-breakdown .nb2 { color: var(--purple); }
         .network-breakdown .nb3 { color: var(--pink); }
-
-        .stats-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
-        .stats-row .stat-mini { background: var(--card); padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); font-size: 12px; }
-        .stats-row .stat-mini strong { color: var(--gold); }
     </style>
 </head>
 <body>
@@ -250,9 +232,9 @@
                 
                 <!-- Main Stats -->
                 <div class="grid">
-                    <div class="card"><div class="card-title">Total Users</div><div class="card-value" id="totalUsers">0</div></div>
-                    <div class="card"><div class="card-title">Deleted Users</div><div class="card-value" id="totalDeleted">0</div></div>
-                    <div class="card"><div class="card-title">Total Ads Watched</div><div class="card-value gold" id="totalAds">0</div></div>
+                    <div class="card"><div class="card-title">Users</div><div class="card-value" id="totalUsers">0</div></div>
+                    <div class="card"><div class="card-title">Deleted</div><div class="card-value" id="totalDeleted">0</div></div>
+                    <div class="card"><div class="card-title">Total Ads</div><div class="card-value gold" id="totalAds">0</div></div>
                     <div class="card"><div class="card-title">Pending Payouts</div><div class="card-value gold" id="pendingPayouts">$0</div></div>
                 </div>
 
@@ -261,7 +243,7 @@
                 <div class="network-stats-grid">
                     <div class="network-card network-1">
                         <div class="network-icon">🔵</div>
-                        <div class="network-name">Monetag SDK</div>
+                        <div class="network-name">Monetag</div>
                         <div class="network-ads blue" id="network1Ads">0</div>
                         <div class="network-users" id="network1Users">0 users</div>
                         <div class="network-detail" id="network1Detail">📺 0 ads</div>
@@ -275,14 +257,14 @@
                     </div>
                     <div class="network-card network-3">
                         <div class="network-icon">🩷</div>
-                        <div class="network-name">Monetag Direct</div>
+                        <div class="network-name">Hilltop</div>
                         <div class="network-ads pink" id="network3Ads">0</div>
                         <div class="network-users" id="network3Users">0 users</div>
                         <div class="network-detail" id="network3Detail">📺 0 ads</div>
                     </div>
                 </div>
 
-                <!-- Recent Users -->
+                <!-- Network Breakdown in Users Table -->
                 <div class="table-container">
                     <h4 style="margin-bottom:10px; color:var(--sub);">Recent Users</h4>
                     <table><thead><tr><th>User</th><th>Ads</th><th>Balance</th><th>Network Usage</th><th>Rank</th></tr></thead><tbody id="userTableBody"></tbody></table>
@@ -292,11 +274,6 @@
             <!-- USERS -->
             <div id="users" class="page">
                 <h2 style="margin-bottom: 15px; color:var(--gold);">👤 All Users</h2>
-                <div style="margin-bottom:10px; display:flex; gap:10px; flex-wrap:wrap;">
-                    <input type="text" id="userSearchInput" placeholder="Search by name or ID..." style="flex:1; min-width:200px; margin:0;">
-                    <button class="btn-blue" style="width:auto; padding:10px 20px;" onclick="searchUsers()">🔍 Search</button>
-                    <button class="btn-gold" style="width:auto; padding:10px 20px;" onclick="resetSearch()">↺ Reset</button>
-                </div>
                 <div class="table-container" style="height:auto; max-height:70vh;">
                     <table>
                         <thead>
@@ -328,7 +305,7 @@
             <div id="referrals" class="page">
                 <h2 style="margin-bottom: 15px; color:var(--gold);">📎 Referral Network</h2>
                 <div style="background:var(--card); padding:15px; border-radius:16px; border:1px solid var(--border); margin-bottom:20px;">
-                    <p style="color:var(--sub);">Every user and the friends they invited. Each referral gives the inviter 10% commission.</p>
+                    <p style="color:var(--sub);">Every user and the friends they invited.</p>
                 </div>
                 <div id="referralNetworkContainer" style="display:flex; flex-direction:column; gap:8px;"></div>
             </div>
@@ -339,7 +316,6 @@
                 <div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap;">
                     <button class="btn-blue" style="width:auto; padding:8px 20px;" onclick="filterPayouts('pending')">⏳ Pending</button>
                     <button class="btn-green" style="width:auto; padding:8px 20px;" onclick="filterPayouts('paid')">✅ Paid</button>
-                    <button class="btn-red" style="width:auto; padding:8px 20px;" onclick="filterPayouts('rejected')">❌ Rejected</button>
                     <button class="btn-gold" style="width:auto; padding:8px 20px;" onclick="filterPayouts('all')">📋 All</button>
                 </div>
                 <div id="payoutContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
@@ -350,10 +326,10 @@
                 <h2 style="margin-bottom: 15px; color:var(--gold);">Send Announcement</h2>
                 <div style="background:var(--card); padding:20px; border-radius:16px; border:1px solid var(--border); margin-bottom:20px;">
                     <textarea id="announceMsg" placeholder="Write message to all users..." rows="4" style="resize:none;"></textarea>
-                    <button class="btn-gold" onclick="sendAnnouncement()">📢 Send to All Users</button>
+                    <button class="btn-gold" onclick="sendAnnouncement()">Send to Users</button>
                 </div>
                 <div style="background:var(--card); padding:15px; border-radius:16px; border:1px solid var(--border);">
-                    <h4 style="color:var(--sub); margin-bottom:10px;">Previous Announcements</h4>
+                    <h4 style="color:var(--sub); margin-bottom:10px;">Previous</h4>
                     <ul id="announceList" style="list-style:none;"></ul>
                 </div>
             </div>
@@ -391,27 +367,19 @@
 
             <!-- SETTINGS -->
             <div id="settings" class="page">
-                <h2 style="margin-bottom: 15px; color:var(--gold);">⚙️ Settings</h2>
+                <h2 style="margin-bottom: 15px; color:var(--gold);">Settings</h2>
                 <div style="background:var(--card); padding:20px; border-radius:16px; border:1px solid var(--border); max-width:500px;">
                     <h4 style="color:var(--sub); margin-bottom:15px;">Change Password</h4>
                     <input type="password" id="newPass" placeholder="New Password">
                     <input type="password" id="confPass" placeholder="Confirm New Password">
                     <button class="btn-blue" onclick="changeAdminPassword()" style="width:100%;">Update Password</button>
                 </div>
-                <div style="background:var(--card); padding:20px; border-radius:16px; border:1px solid var(--border); max-width:500px; margin-top:20px;">
-                    <h4 style="color:var(--sub); margin-bottom:15px;">Withdrawal Settings</h4>
-                    <p style="color:var(--sub); font-size:13px;">💰 Minimum Withdrawal: <strong style="color:var(--gold);">$2.00</strong></p>
-                    <p style="color:var(--sub); font-size:13px;">📊 Ads Required: <strong style="color:var(--gold);">5,000 ads</strong></p>
-                    <p style="color:var(--sub); font-size:13px;">💵 Rate: <strong style="color:var(--gold);">$0.0004 per ad</strong></p>
-                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // ============================================
-        // FIREBASE CONFIGURATION
-        // ============================================
+        // --- FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyAIvkzIWM-0giOeJjoiYHv6Sgkb9VC70GE",
             authDomain: "ads-arena-850c5.firebaseapp.com",
@@ -424,15 +392,7 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // ============================================
-        // CONSTANTS
-        // ============================================
-        const MIN_WITHDRAW = 2.00;
-        const ADS_FOR_WITHDRAW = 5000;
-
-        // ============================================
-        // TOAST NOTIFICATIONS
-        // ============================================
+        // --- TOAST ---
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -442,9 +402,7 @@
             toast._timeout = setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
 
-        // ============================================
-        // LOGIN / LOGOUT
-        // ============================================
+        // --- LOGIN ---
         function adminLogin() {
             const email = document.getElementById('adminEmail').value.trim();
             const pass = document.getElementById('adminPassword').value.trim();
@@ -455,36 +413,20 @@
             errorBox.innerText = "";
             if(!email || !pass) { errorBox.innerText = "Enter credentials."; return; }
 
-            spinner.style.display = 'flex'; 
-            loginBtn.disabled = true; 
-            loginBtn.innerText = "Logging...";
+            spinner.style.display = 'flex'; loginBtn.disabled = true; loginBtn.innerText = "Logging...";
 
             auth.signInWithEmailAndPassword(email, pass)
                 .then(() => {
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('dashboardApp').style.display = 'flex';
-                    loginBtn.disabled = false; 
-                    loginBtn.innerText = "Login"; 
-                    spinner.style.display = 'none';
-                    loadAllData();
+                    loginBtn.disabled = false; loginBtn.innerText = "Login"; spinner.style.display = 'none';
                 })
                 .catch((error) => {
-                    spinner.style.display = 'none'; 
-                    loginBtn.disabled = false; 
-                    loginBtn.innerText = "Login";
+                    spinner.style.display = 'none'; loginBtn.disabled = false; loginBtn.innerText = "Login";
                     errorBox.innerText = "❌ Access Denied. Check credentials.";
                 });
         }
 
-        function adminLogout() {
-            if(confirm("Logout?")) { 
-                auth.signOut().then(() => { location.reload(); }); 
-            }
-        }
-
-        // ============================================
-        // THEME / SIDEBAR
-        // ============================================
         function toggleTheme() {
             document.body.classList.toggle('theme-golden');
             const btn = document.querySelector('.theme-toggle-btn');
@@ -509,52 +451,16 @@
             if(pageId === 'deleted') loadDeletedUsers();
         }
 
-        // ============================================
-        // HELPERS
-        // ============================================
-        function calculateBalance(ads) {
-            return (ads / ADS_FOR_WITHDRAW) * MIN_WITHDRAW;
+        function adminLogout() {
+            if(confirm("Logout?")) { auth.signOut().then(() => { location.reload(); }); }
         }
 
-        function getNetworkBreakdownHTML(adCounts) {
-            if (!adCounts) return '<span style="color:var(--sub); font-size:11px;">No data</span>';
-            
-            const n1 = adCounts.network1 || 0;
-            const n2 = adCounts.network2 || 0;
-            const n3 = adCounts.network3 || 0;
-            
-            const total = n1 + n2 + n3;
-            if (total === 0) return '<span style="color:var(--sub); font-size:11px;">No ads</span>';
-            
-            return `
-                <span class="network-tag n1">Monetag: ${n1}</span>
-                <span class="network-tag n2">Adsterra: ${n2}</span>
-                <span class="network-tag n3">Direct: ${n3}</span>
-            `;
+        // Helper: calculate USD balance from ads
+        function calculateUserBalance(ads) {
+            return (ads / 2000) * 1;
         }
 
-        function getNetworkWithMostAds(adCounts) {
-            if (!adCounts) return 'None';
-            const networks = [
-                { key: 'network1', name: 'Monetag', color: 'n1' },
-                { key: 'network2', name: 'Adsterra', color: 'n2' },
-                { key: 'network3', name: 'Direct', color: 'n3' }
-            ];
-            let max = 0;
-            let best = { name: 'None', color: '' };
-            networks.forEach(n => {
-                const count = adCounts[n.key] || 0;
-                if (count > max) {
-                    max = count;
-                    best = n;
-                }
-            });
-            return max > 0 ? `<span class="network-tag ${best.color}">${best.name}</span>` : 'None';
-        }
-
-        // ============================================
-        // DELETE USER
-        // ============================================
+        // --- DELETE USER (with logging) ---
         function deleteUser(userId, userName) {
             if (!confirm(`⚠️ Are you sure you want to delete user "${userName}"?\n\nThis action CANNOT be undone!\nAll their data will be permanently removed.`)) {
                 return;
@@ -577,7 +483,7 @@
                     telegram_id: userData.telegram_id || 'N/A',
                     ads_watched: userData.ads_watched || 0,
                     referrals: userData.referrals || 0,
-                    balance: calculateBalance(userData.ads_watched || 0),
+                    balance: calculateUserBalance(userData.ads_watched || 0),
                     deleted_by: adminEmail,
                     deleted_at: firebase.firestore.FieldValue.serverTimestamp()
                 };
@@ -615,29 +521,7 @@
             });
         }
 
-        // ============================================
-        // EDIT USER ADS
-        // ============================================
-        function editUserAds(userId, currentAds) {
-            const newAds = prompt(`Enter new number of ads watched for this user:`, currentAds);
-            if (newAds === null) return;
-            const numAds = parseInt(newAds);
-            if (isNaN(numAds) || numAds < 0) {
-                showToast('❌ Please enter a valid number (0 or greater).', true);
-                return;
-            }
-            db.collection("users").doc(userId).update({
-                ads_watched: numAds
-            }).then(() => {
-                showToast(`✅ Ads updated to ${numAds}!`);
-            }).catch((err) => {
-                showToast('❌ Error updating: ' + err.message, true);
-            });
-        }
-
-        // ============================================
-        // LOAD DELETED USERS
-        // ============================================
+        // --- LOAD DELETED USERS ---
         function loadDeletedUsers() {
             const container = document.getElementById('deletedUsersContainer');
             container.innerHTML = '<div style="color:var(--sub); text-align:center; padding:20px;">Loading deleted users log...</div>';
@@ -680,128 +564,161 @@
                 });
         }
 
-        // ============================================
-        // LOAD ALL DATA
-        // ============================================
-        let allUsersData = [];
-        let searchQuery = '';
-
-        function loadAllData() {
-            db.collection("users").onSnapshot((snapshot) => {
-                let totalUsers = 0, totalAds = 0;
-                let usersHtml = '', allUsersHtml = '';
-                let usersArray = [];
-                
-                // Network counters
-                let network1Total = 0, network2Total = 0, network3Total = 0;
-                let network1Users = 0, network2Users = 0, network3Users = 0;
-                
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.telegram_id && !data.telegram_id.startsWith("test_")) {
-                        usersArray.push({id: doc.id, ...data});
-                    }
-                });
-
-                allUsersData = usersArray;
-                usersArray.sort((a,b) => (b.ads_watched||0) - (a.ads_watched||0));
-
-                usersArray.forEach((data, index) => {
-                    totalUsers++;
-                    totalAds += (data.ads_watched||0);
-                    let name = data.first_name || data.username || 'Anonymous';
-                    const balance = calculateBalance(data.ads_watched || 0);
-                    const balanceStr = balance.toFixed(2);
-                    const ads = data.ads_watched || 0;
-                    
-                    const adCounts = data.ad_counts || {};
-                    const n1 = adCounts.network1 || 0;
-                    const n2 = adCounts.network2 || 0;
-                    const n3 = adCounts.network3 || 0;
-                    
-                    network1Total += n1;
-                    network2Total += n2;
-                    network3Total += n3;
-                    
-                    if (n1 > 0) network1Users++;
-                    if (n2 > 0) network2Users++;
-                    if (n3 > 0) network3Users++;
-                    
-                    const networkBreakdown = getNetworkBreakdownHTML(adCounts);
-                    const topNetwork = getNetworkWithMostAds(adCounts);
-                    
-                    // Filter for search
-                    const searchLower = searchQuery.toLowerCase();
-                    const matchesSearch = !searchQuery || 
-                        name.toLowerCase().includes(searchLower) || 
-                        (data.telegram_id || '').includes(searchQuery);
-                    
-                    if(index < 10) {
-                        usersHtml += `<tr>
-                            <td>${name}</td>
-                            <td>${ads}</td>
-                            <td class="balance-usd">$${balanceStr}</td>
-                            <td>${topNetwork}</td>
-                            <td><span class="rank-badge">#${index+1}</span></td>
-                        </tr>`;
-                    }
-                    
-                    if (matchesSearch) {
-                        allUsersHtml += `<tr>
-                            <td>${data.telegram_id||'N/A'}</td>
-                            <td>${name}</td>
-                            <td><strong>${ads}</strong></td>
-                            <td class="balance-usd">$${balanceStr}</td>
-                            <td>${data.referrals||0}</td>
-                            <td style="font-size:11px; min-width:120px;">${networkBreakdown}</td>
-                            <td>
-                                <div class="user-actions">
-                                    <button class="btn-edit" onclick="editUserAds('${data.id}', ${ads})">✏️ Edit</button>
-                                    <button class="btn-delete" onclick="deleteUser('${data.id}', '${name.replace(/'/g, "\\'")}')">🗑️ Delete</button>
-                                </div>
-                            </td>
-                        </tr>`;
-                    }
-                });
-
-                // Update network stats
-                document.getElementById('network1Ads').innerText = network1Total;
-                document.getElementById('network2Ads').innerText = network2Total;
-                document.getElementById('network3Ads').innerText = network3Total;
-                document.getElementById('network1Users').innerText = network1Users + ' users';
-                document.getElementById('network2Users').innerText = network2Users + ' users';
-                document.getElementById('network3Users').innerText = network3Users + ' users';
-                
-                document.getElementById('network1Detail').innerHTML = `📺 ${network1Total} ads from ${network1Users} users`;
-                document.getElementById('network2Detail').innerHTML = `📺 ${network2Total} ads from ${network2Users} users`;
-                document.getElementById('network3Detail').innerHTML = `📺 ${network3Total} ads from ${network3Users} users`;
-
-                document.getElementById('totalUsers').innerText = totalUsers;
-                document.getElementById('totalAds').innerText = totalAds;
-                document.getElementById('userTableBody').innerHTML = usersHtml || '<tr><td colspan="5">No users</td></tr>';
-                document.getElementById('allUsersBody').innerHTML = allUsersHtml || '<tr><td colspan="7">No users found</td></tr>';
-                
-                // Update deleted count
-                db.collection("deleted_users").get().then(snap => {
-                    document.getElementById('totalDeleted').innerText = snap.size;
-                });
+        // --- EDIT ADS FUNCTION ---
+        function editUserAds(userId, currentAds) {
+            const newAds = prompt(`Enter new number of ads watched for this user:`, currentAds);
+            if (newAds === null) return;
+            const numAds = parseInt(newAds);
+            if (isNaN(numAds) || numAds < 0) {
+                showToast('❌ Please enter a valid number (0 or greater).', true);
+                return;
+            }
+            db.collection("users").doc(userId).update({
+                ads_watched: numAds
+            }).then(() => {
+                showToast(`✅ Ads updated to ${numAds}!`);
+            }).catch((err) => {
+                showToast('❌ Error updating: ' + err.message, true);
             });
         }
 
-        function searchUsers() {
-            searchQuery = document.getElementById('userSearchInput').value.trim();
-            loadAllData();
+        // --- GET NETWORK BREAKDOWN HTML ---
+        function getNetworkBreakdownHTML(adCounts) {
+            if (!adCounts) return '<span style="color:var(--sub); font-size:11px;">No data</span>';
+            
+            const n1 = adCounts.network1 || 0;
+            const n2 = adCounts.network2 || 0;
+            const n3 = adCounts.network3 || 0;
+            
+            const total = n1 + n2 + n3;
+            if (total === 0) return '<span style="color:var(--sub); font-size:11px;">No ads</span>';
+            
+            return `
+                <span class="network-tag n1">Monetag: ${n1}</span>
+                <span class="network-tag n2">Adsterra: ${n2}</span>
+                <span class="network-tag n3">Hilltop: ${n3}</span>
+            `;
         }
 
-        function resetSearch() {
-            document.getElementById('userSearchInput').value = '';
-            searchQuery = '';
-            loadAllData();
+        function getNetworkWithMostAds(adCounts) {
+            if (!adCounts) return 'None';
+            const networks = [
+                { key: 'network1', name: 'Monetag', color: 'n1' },
+                { key: 'network2', name: 'Adsterra', color: 'n2' },
+                { key: 'network3', name: 'Hilltop', color: 'n3' }
+            ];
+            let max = 0;
+            let best = { name: 'None', color: '' };
+            networks.forEach(n => {
+                const count = adCounts[n.key] || 0;
+                if (count > max) {
+                    max = count;
+                    best = n;
+                }
+            });
+            return max > 0 ? `<span class="network-tag ${best.color}">${best.name}</span>` : 'None';
         }
 
-        // ============================================
-        // REFERRAL NETWORK
-        // ============================================
+        // --- DASHBOARD & USERS ---
+        db.collection("users").onSnapshot((snapshot) => {
+            let totalUsers = 0, totalAds = 0, totalRef = 0;
+            let usersHtml = '', allUsersHtml = '';
+            let usersArray = [];
+            
+            // Network counters
+            let network1Total = 0;
+            let network2Total = 0;
+            let network3Total = 0;
+            let network1Users = 0;
+            let network2Users = 0;
+            let network3Users = 0;
+            
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                if (data.telegram_id && !data.telegram_id.startsWith("test_")) {
+                    usersArray.push({id: doc.id, ...data});
+                }
+            });
+
+            usersArray.sort((a,b) => (b.ads_watched||0) - (a.ads_watched||0));
+
+            usersArray.forEach((data, index) => {
+                totalUsers++;
+                totalAds += (data.ads_watched||0);
+                totalRef += (data.referrals||0);
+                let name = data.first_name || data.username || 'Anonymous';
+                const balance = calculateUserBalance(data.ads_watched || 0);
+                const balanceStr = balance.toFixed(2);
+                const ads = data.ads_watched || 0;
+                
+                // Get network counts
+                const adCounts = data.ad_counts || {};
+                const n1 = adCounts.network1 || 0;
+                const n2 = adCounts.network2 || 0;
+                const n3 = adCounts.network3 || 0;
+                
+                network1Total += n1;
+                network2Total += n2;
+                network3Total += n3;
+                
+                if (n1 > 0) network1Users++;
+                if (n2 > 0) network2Users++;
+                if (n3 > 0) network3Users++;
+                
+                const networkBreakdown = getNetworkBreakdownHTML(adCounts);
+                const topNetwork = getNetworkWithMostAds(adCounts);
+                
+                if(index < 10) {
+                    usersHtml += `<tr>
+                        <td>${name}</td>
+                        <td>${ads}</td>
+                        <td class="balance-usd">$${balanceStr}</td>
+                        <td>${topNetwork}</td>
+                        <td><span class="rank-badge">#${index+1}</span></td>
+                    </tr>`;
+                }
+                
+                allUsersHtml += `<tr>
+                    <td>${data.telegram_id||'N/A'}</td>
+                    <td>${name}</td>
+                    <td><strong>${ads}</strong></td>
+                    <td class="balance-usd">$${balanceStr}</td>
+                    <td>${data.referrals||0}</td>
+                    <td style="font-size:11px; min-width:120px;">${networkBreakdown}</td>
+                    <td>
+                        <div class="user-actions">
+                            <button class="btn-edit" onclick="editUserAds('${data.id}', ${ads})">✏️ Edit</button>
+                            <button class="btn-delete" onclick="deleteUser('${data.id}', '${name.replace(/'/g, "\\'")}')">🗑️ Delete</button>
+                        </div>
+                    </td>
+                </tr>`;
+            });
+
+            // Update network stats with names
+            document.getElementById('network1Ads').innerText = network1Total;
+            document.getElementById('network2Ads').innerText = network2Total;
+            document.getElementById('network3Ads').innerText = network3Total;
+            document.getElementById('network1Users').innerText = network1Users + ' users';
+            document.getElementById('network2Users').innerText = network2Users + ' users';
+            document.getElementById('network3Users').innerText = network3Users + ' users';
+            
+            // Add details
+            document.getElementById('network1Detail').innerHTML = `📺 ${network1Total} ads from ${network1Users} users`;
+            document.getElementById('network2Detail').innerHTML = `📺 ${network2Total} ads from ${network2Users} users`;
+            document.getElementById('network3Detail').innerHTML = `📺 ${network3Total} ads from ${network3Users} users`;
+
+            document.getElementById('totalUsers').innerText = totalUsers;
+            document.getElementById('totalAds').innerText = totalAds;
+            document.getElementById('userTableBody').innerHTML = usersHtml || '<tr><td colspan="5">No users</td></tr>';
+            document.getElementById('allUsersBody').innerHTML = allUsersHtml || '<tr><td colspan="7">No users</td></tr>';
+            
+            // Update deleted count
+            db.collection("deleted_users").get().then(snap => {
+                document.getElementById('totalDeleted').innerText = snap.size;
+            });
+        });
+
+        // --- REFERRAL NETWORK ---
         function loadReferralNetwork() {
             const container = document.getElementById('referralNetworkContainer');
             container.innerHTML = '<div style="color:var(--sub);">Loading network...</div>';
@@ -829,16 +746,13 @@
                         }
                     }
                     
-                    const balance = calculateBalance(user.ads_watched || 0);
-                    const refCount = user.referrals || 0;
+                    const balance = calculateUserBalance(user.ads_watched || 0);
                     
                     html += `
                         <div class="ref-user-block">
                             <div class="ref-main">
                                 <div><strong>👤 ${name}</strong> <span style="color:var(--sub); font-size:13px;">${user.telegram_id || ''}</span></div>
-                                <div style="color:var(--gold); font-size:13px;">
-                                    ${refs.length} referrals | Balance: $${balance.toFixed(2)} | Ref Code: ${user.referral_code || 'N/A'}
-                                </div>
+                                <div style="color:var(--gold); font-size:13px;">${refs.length} referrals | Balance: $${balance.toFixed(2)}</div>
                             </div>
                             <div class="ref-list-inline">
                                 ${refs.length > 0 ? refs.map(r => `<span class="ref-tag">${r.first_name || r.username || 'User'}</span>`).join('') : '<span style="color:var(--sub); font-size:12px;">No referrals yet</span>'}
@@ -854,9 +768,7 @@
             });
         }
 
-        // ============================================
-        // PAYOUT SYSTEM
-        // ============================================
+        // --- PAYOUT SYSTEM ---
         let currentFilter = 'pending';
 
         function filterPayouts(filter) {
@@ -896,14 +808,14 @@
                             </div>
                             <div style="font-weight:bold; color:var(--gold); font-size:18px;">$${amount.toFixed(2)}</div>
                             <div>
-                                <span class="${status === 'pending' ? 'badge-pending' : status === 'paid' ? 'badge-paid' : 'badge-rejected'}">${status.toUpperCase()}</span>
+                                <span class="${status === 'pending' ? 'badge-pending' : 'badge-paid'}">${status.toUpperCase()}</span>
                             </div>
                             <div style="display:flex; gap:6px; flex-wrap:wrap;">
                                 ${status === 'pending' ? `
                                     <button class="btn-green btn-sm" onclick="markPaid('${id}', '${userName}', ${amount})">✅ Pay</button>
                                     <button class="btn-red btn-sm" onclick="rejectPayout('${id}')">❌ Reject</button>
                                 ` : `
-                                    <span style="color:var(--green); font-size:13px;">${status === 'paid' ? '✅ Paid' : '❌ Rejected'}</span>
+                                    <span style="color:var(--green); font-size:13px;">✅ Paid</span>
                                 `}
                             </div>
                         </div>
@@ -964,8 +876,7 @@
                 const amount = data.amount || 0;
 
                 db.collection("withdrawals").doc(payoutId).update({
-                    status: 'rejected',
-                    rejected_at: firebase.firestore.FieldValue.serverTimestamp()
+                    status: 'rejected'
                 }).then(() => {
                     if (userId) {
                         db.collection("admin_inbox").add({
@@ -983,9 +894,7 @@
             });
         }
 
-        // ============================================
-        // ANNOUNCEMENTS
-        // ============================================
+        // --- ANNOUNCE ---
         function sendAnnouncement() {
             let msg = document.getElementById('announceMsg').value;
             if(!msg.trim()) return alert("Write a message!");
@@ -994,7 +903,7 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 document.getElementById('announceMsg').value = '';
-                showToast("Announcement sent to all users!");
+                showToast("Announcement sent!");
             });
         }
 
@@ -1002,23 +911,17 @@
             let html = '';
             snap.forEach(doc => {
                 let data = doc.data();
-                let time = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : '';
-                html += `<li style="background:var(--bg); padding:10px; margin-bottom:5px; border-radius:5px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:5px;">
-                    <span>${data.message} <span style="color:var(--sub); font-size:11px;">${time}</span></span>
+                html += `<li style="background:var(--bg); padding:10px; margin-bottom:5px; border-radius:5px; display:flex; justify-content:space-between; align-items:center;">
+                    <span>${data.message}</span>
                     <button class="btn-red" onclick="deleteAnnounce('${doc.id}')">Delete</button>
                 </li>`;
             });
             document.getElementById('announceList').innerHTML = html || '<li style="color:var(--sub);">No announcements</li>';
         });
 
-        function deleteAnnounce(id) { 
-            if(confirm("Delete this announcement?")) 
-                db.collection("announcements").doc(id).delete(); 
-        }
+        function deleteAnnounce(id) { if(confirm("Delete?")) db.collection("announcements").doc(id).delete(); }
 
-        // ============================================
-        // PRIVATE MESSAGES
-        // ============================================
+        // --- PRIVATE MESSAGES ---
         let currentChatUserId = null;
         let messagesUnsubscribe = null;
 
@@ -1112,15 +1015,12 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             }).then(() => {
                 input.value = '';
-                showToast("Message sent!");
             }).catch((err) => {
                 alert("Error sending message: " + err.message);
             });
         }
 
-        // ============================================
-        // GROUP CHAT
-        // ============================================
+        // --- GROUP CHAT ---
         function loadAdminGroupChat() {
             db.collection("groupchat").orderBy("timestamp", "asc").onSnapshot((snap) => {
                 const container = document.getElementById('groupChatStream');
@@ -1167,16 +1067,14 @@
         function deleteGroupMessage(msgId) {
             if (confirm("Delete this user's message?")) {
                 db.collection("groupchat").doc(msgId).delete().then(() => {
-                    showToast("Message deleted!");
+                    console.log("Message deleted");
                 }).catch((e) => {
                     console.error("Error deleting message:", e);
                 });
             }
         }
 
-        // ============================================
-        // SETTINGS - CHANGE PASSWORD
-        // ============================================
+        // --- SETTINGS ---
         function changeAdminPassword() {
             const newP = document.getElementById('newPass').value;
             const conf = document.getElementById('confPass').value;
@@ -1192,24 +1090,7 @@
             }
         }
 
-        // ============================================
-        // INIT
-        // ============================================
-        function loadAllData() {
-            // This function is called after login
-            // All the listeners are already set up
-        }
-
-        // Auto-login check
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('dashboardApp').style.display = 'flex';
-                loadAllData();
-            }
-        });
-
-        // Load initial data
+        // Initial loads
         setTimeout(() => {
             loadPayouts();
             loadMessages();
